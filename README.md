@@ -1,2 +1,3 @@
 # noscan
-ciscn-final scanner
+
+make build编译
