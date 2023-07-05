@@ -107,7 +107,7 @@ func MS17010Scan(info *common.HostInfo) error {
 	userID := reply[32:34]
 	treeConnectRequest[32] = userID[0]
 	treeConnectRequest[33] = userID[1]
-	// TODO change the ip in tree path though it doesn't matter
+	// noyet change the ip in tree path though it doesn't matter
 	_, err = conn.Write(treeConnectRequest)
 	if err != nil {
 		return err

@@ -1,24 +1,33 @@
 package target
 
 import (
-	"fmt"
+	"bufio"
 	"os"
 	"strings"
 )
 
-func main() {
-	// 读取target文件
-	data, err := os.ReadFile("target")
+func ReadIPAddressesFromFile(filepath string) ([]string, error) {
+	file, err := os.Open(filepath)
 	if err != nil {
-		fmt.Println("无法读取文件：", err)
-		return
+		return nil, err
 	}
 
-	// 将文件内容分割为字符串数组
-	ipAddresses := strings.Split(string(data), "\n")
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 
-	// 打印IP地址
-	for _, ip := range ipAddresses {
-		fmt.Println(ip)
+	scanner := bufio.NewScanner(file)
+	var ipAddresses []string
+	for scanner.Scan() {
+		ip := strings.TrimSpace(scanner.Text())
+		if ip != "" {
+			ipAddresses = append(ipAddresses, ip)
+		}
 	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return ipAddresses, nil
 }
