@@ -1,3 +1,1 @@
-# noscan
-
-make build编译
+# noscan```shell├── LICENSE           # Apache v2.0├── Makefile          # build and test├── README.md├── cmd               # shell interaction│   └── cmd.go├── common.mk├── fscan             # a reference├── go.mod├── main.go├── result            # Mapping output├── rules             # identify by Fingerprint│   └── rules.go├── scan              # tcp, syn, fin, null scan│   └── scan.go└── utils             # io fmt and ...    └── utils.go```
