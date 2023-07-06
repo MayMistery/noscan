@@ -21,7 +21,8 @@ func Flag(config Configs) {
 	//flag.Int64Var(&Timeout, "time", 3, "Set timeout")
 	flag.BoolVar(&config.jsonOutput, "json", true, "using json output")
 	flag.BoolVar(&config.ciscn, "d", true, "to complete ciscn task")
-	flag.StringVar(&config.filepath, "path", "../result/result.json", "output file path")
+	flag.StringVar(&config.InputFilepath, "iPath", "target", "input file path")
+	flag.StringVar(&config.outputFilepath, "oPath", "../result/result.json", "output file path")
 	flag.StringVar(&config.ScanType, "t", "tcp", "scan method, tcp | syn | fin | NULL")
 
 	// TODO to add flags and corresponding var

@@ -14,11 +14,12 @@ type IpInfo struct {
 }
 
 type Configs struct {
-	CIDRInfo   map[string]IpInfo
-	jsonOutput bool
-	ciscn      bool
-	filepath   string
-	ScanType   string
+	CIDRInfo       map[string]IpInfo
+	jsonOutput     bool
+	ciscn          bool
+	InputFilepath  string
+	outputFilepath string
+	ScanType       string
 }
 
 type Command interface {

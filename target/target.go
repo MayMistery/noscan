@@ -2,11 +2,13 @@ package target
 
 import (
 	"bufio"
+	"github.com/MayMistery/noscan/cmd"
 	"os"
 	"strings"
 )
 
-func ReadIPAddressesFromFile(filepath string) ([]string, error) {
+func ReadIPAddressesFromFile(config cmd.Configs) ([]string, error) {
+	filepath := config.InputFilepath
 	file, err := os.Open(filepath)
 	if err != nil {
 		return nil, err
