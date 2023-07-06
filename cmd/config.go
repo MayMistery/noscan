@@ -17,6 +17,7 @@ type Configs struct {
 	CIDRInfo   map[string]IpInfo
 	jsonOutput bool
 	ciscn      bool
+	filepath   string
 }
 
 type Command interface {
