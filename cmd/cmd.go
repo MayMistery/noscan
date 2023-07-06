@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/MayMistery/noscan/scan"
+	"github.com/MayMistery/noscan/utils"
 	"runtime"
 	"runtime/debug"
 	"time"
@@ -21,8 +23,11 @@ func GarbageCollection() {
 }
 
 func Exec() {
-	Flag()
-	//Parse()
-	//scan.Scan(CIDRInfo)
-	//utils.
+	var cfg Configs
+
+	Flag(cfg)
+	scan.Scan(cfg)
+	if cfg.jsonOutput == true {
+		utils.OutputJsonResult(cfg.CIDRInfo)
+	}
 }
