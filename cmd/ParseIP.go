@@ -56,6 +56,7 @@ func IPRange(ipNet *net.IPNet) (net.IP, net.IP) {
 func GetPools(ipPoolFuncList []func() string) func() string {
 	return func() string {
 		for _, ipPoolFunc := range ipPoolFuncList {
+			//TODO maybe have bug, but look well
 			for ip := ipPoolFunc(); ip != ""; ip = ipPoolFunc() {
 				return ip
 			}

@@ -35,7 +35,10 @@ func Exec() {
 	var cfg cmd.Configs
 
 	cmd.Flag(&cfg)
-	scan.Scan(cfg)
+	err := scan.Scan(cfg)
+	if err != nil {
+		//TODO Handle error
+	}
 	if cfg.JsonOutput {
 		utils.OutputJsonResult(cfg)
 	} else {

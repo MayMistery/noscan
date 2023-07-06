@@ -27,8 +27,11 @@ func InitTarget(cfg cmd.Configs) error {
 	return nil
 }
 
-func Scan(config cmd.Configs) {
-
+func Scan(config cmd.Configs) error {
+	err := InitTarget(config)
+	if err != nil {
+		return err
+	}
 	ipList := config.CIDRInfo
 
 	switch config.ScanType {
@@ -38,6 +41,8 @@ func Scan(config cmd.Configs) {
 	default:
 		tcp(ipList)
 	}
+
+	return nil
 }
 
 //func CheckAlive()
