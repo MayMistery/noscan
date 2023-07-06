@@ -17,11 +17,13 @@ func InitTarget(cfg cmd.Configs) error {
 	}
 
 	var ipPool cmd.IPPool
+	var ipPoolsFuncList []func() string
 	for _, cidrIp := range cidrIPs {
 		ipPool.SetPool(cidrIp)
-		cmd.IpPools = append(cmd.IpPools, ipPool.GetPool())
+		ipPoolsFuncList = append(ipPoolsFuncList, ipPool.GetPool())
 	}
 
+	cmd.IpPools = cmd.GetPools(ipPoolsFuncList)
 	return nil
 }
 

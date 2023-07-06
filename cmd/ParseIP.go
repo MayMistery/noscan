@@ -41,7 +41,6 @@ func ReadIPAddressesFromFile(config Configs) ([]string, error) {
 	return ipAddresses, nil
 }
 
-// Todo trans target CIDR to list
 func IPRange(ipNet *net.IPNet) (net.IP, net.IP) {
 	start := ipNet.IP
 	mask := ipNet.Mask
@@ -52,6 +51,17 @@ func IPRange(ipNet *net.IPNet) (net.IP, net.IP) {
 		bcst[ipIdx] = ipNet.IP[ipIdx] | ^mask[len(mask)-i-1]
 	}
 	return start, bcst
+}
+
+func GetPools(ipPoolFuncList []func() string) func() string {
+	return func() string {
+		for _, ipPoolFunc := range ipPoolFuncList {
+			for ip := ipPoolFunc(); ip != ""; ip = ipPoolFunc() {
+				return ip
+			}
+		}
+		return ""
+	}
 }
 
 func (ipPool *IPPool) SetPool(cidrIp string) {

@@ -10,9 +10,7 @@ func TestInitTarget(t *testing.T) {
 	var cfg cmd.Configs
 	cfg.InputFilepath = "../data/target"
 	InitTarget(cfg)
-	for _, ipPoolFunc := range cmd.IpPools {
-		fmt.Println(ipPoolFunc())
-		fmt.Println(ipPoolFunc())
-		fmt.Println(ipPoolFunc())
+	for i := 0; i < 513; i++ {
+		fmt.Println(cmd.IpPools())
 	}
 }
