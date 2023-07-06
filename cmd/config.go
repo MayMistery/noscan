@@ -7,14 +7,13 @@ type PortInfo struct {
 }
 
 type IpInfo struct {
-	Host       string     `json:"host"`
 	Services   []PortInfo `json:"services"`
 	DeviceInfo string     `json:"deviceinfo"`
 	Honeypot   []string   `json:"honeypot"`
 	Timestamp  string     `json:"timestamp"`
 }
 
-type CIDRInfo []IpInfo
+var CIDRInfo map[string]IpInfo
 
 type Command interface {
 	//TODO
