@@ -11,6 +11,7 @@
 # Dev
 .idea
 .vscode
+go.sum
 
 # Test binary, built with `go test -c`
 *.test
@@ -20,6 +21,7 @@
 *.out
 result
 res.*
+database.db
 
 # Dependency directories (remove the comment below to include it)
 # vendor/

@@ -8,7 +8,7 @@ import (
 )
 
 type Storage struct {
-	db *storm.DB
+	ipdb *storm.DB
 }
 
 func NewStorage(path string) (*Storage, error) {
@@ -17,20 +17,20 @@ func NewStorage(path string) (*Storage, error) {
 		return nil, err
 	}
 
-	return &Storage{db: db}, nil
+	return &Storage{ipdb: db}, nil
 }
 
 func (s *Storage) Close() error {
-	return s.db.Close()
+	return s.ipdb.Close()
 }
 
 func (s *Storage) SaveIpCache(ipCache storage.IpCache) error {
-	return s.db.Save(&ipCache)
+	return s.ipdb.Save(&ipCache)
 }
 
 func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 	var ipCache storage.IpCache
-	err := s.db.One("Ip", ip, &ipCache)
+	err := s.ipdb.One("Ip", ip, &ipCache)
 	if err != nil {
 		return nil, err
 	}
@@ -38,9 +38,10 @@ func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 	return &ipCache, nil
 }
 
-func CreatDatabase() {
+func InitDatabase(config cmd.Configs) {
 	// 创建一个新的存储实例
-	db, err := NewStorage("database.db")
+	var err error
+	cmd.DB, err = NewStorage(config.DBFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,26 +50,5 @@ func CreatDatabase() {
 		if err != nil {
 			//TODO add errorLog
 		}
-	}(db)
-
-	// 存储示例数据
-	ipCache := storage.IpCache{
-		Ip:     "192.168.0.1",
-		IpInfo: cmd.IpInfo{},
-		Mark:   true,
-	}
-	err = db.SaveIpCache(ipCache)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// 获取存储的数据
-	ip := "192.168.0.1"
-	cachedIp, err := db.GetIpCache(ip)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Cached IP:", cachedIp.Ip)
-
-	// 其他存储操作...
+	}(cmd.DB)
 }

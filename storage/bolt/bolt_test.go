@@ -2,14 +2,17 @@ package bolt
 
 import (
 	"fmt"
+	"github.com/MayMistery/noscan/cmd"
 	"github.com/boltdb/bolt"
 	"log"
 	"testing"
 )
 
 func TestDb(t *testing.T) {
-	CreatDatabase()
-	db, err := bolt.Open("database.db", 0666, nil)
+	var testConfig cmd.Configs
+	testConfig.DBFilePath = "../../data/database.db"
+	InitDatabase(testConfig)
+	db, err := bolt.Open("database.ipdb", 0666, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

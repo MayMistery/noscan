@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
 	"github.com/MayMistery/noscan/scan"
+	"github.com/MayMistery/noscan/storage/bolt"
 	"github.com/MayMistery/noscan/utils"
 	"time"
 )
@@ -32,15 +33,17 @@ func main() {
 }
 
 func Exec() {
-	var cfg cmd.Configs
+	var config cmd.Configs
 
-	cmd.Flag(&cfg)
-	err := scan.Scan(cfg)
+	cmd.Flag(&config)
+	bolt.InitDatabase(config)
+
+	err := scan.Scan(config)
 	if err != nil {
 		//TODO Handle error
 	}
-	if cfg.JsonOutput {
-		utils.OutputJsonResult(cfg)
+	if config.JsonOutput {
+		utils.OutputJsonResult(config)
 	} else {
 		//TODO add terminal output
 	}
