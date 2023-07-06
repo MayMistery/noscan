@@ -15,13 +15,16 @@ noscan version: ` + version.Version + `
 	print(banner)
 }
 
-func Flag() {
+func Flag(config Configs) {
 	Banner()
 	//flag.StringVar(&, "h", "", "IP address of the host you want to scan,for example: 192.168.11.11 | 192.168.11.11-255 | 192.168.11.11,192.168.11.12")
 	//flag.Int64Var(&Timeout, "time", 3, "Set timeout")
-	//flag.BoolVar(&Ping, "ping", false, "using ping replace icmp")
+	flag.BoolVar(&config.jsonOutput, "json", true, "using json output")
+	flag.BoolVar(&config.ciscn, "d", true, "to complete ciscn task")
 
 	// TODO to add flags and corresponding var
+
+	flag.PrintDefaults()
 
 	flag.Parse()
 }

@@ -13,7 +13,11 @@ type IpInfo struct {
 	Timestamp  string     `json:"timestamp"`
 }
 
-var CIDRInfo map[string]IpInfo
+type Configs struct {
+	CIDRInfo   map[string]IpInfo
+	jsonOutput bool
+	ciscn      bool
+}
 
 type Command interface {
 	//TODO
