@@ -1,11 +1,28 @@
 package scan
 
 import (
+	"fmt"
 	"github.com/MayMistery/noscan/cmd"
 )
 
 func tcp(CIDRInfo map[string]cmd.IpInfo) {
 	//TODO scan implementation details.
+}
+
+func InitTarget(cfg cmd.Configs) error {
+	cidrIPs, err := cmd.ReadIPAddressesFromFile(cfg)
+	if err != nil {
+		fmt.Println("[-]Read target ip fail")
+		return err
+	}
+
+	var ipPool cmd.IPPool
+	for _, cidrIp := range cidrIPs {
+		ipPool.SetPool(cidrIp)
+		cmd.IpPools = append(cmd.IpPools, ipPool.GetPool())
+	}
+
+	return nil
 }
 
 func Scan(config cmd.Configs) {
@@ -20,6 +37,8 @@ func Scan(config cmd.Configs) {
 		tcp(ipList)
 	}
 }
+
+//func CheckAlive()
 
 //type Result struct {
 //	IP   string `json:"ip"`

@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"github.com/MayMistery/noscan/scan"
-	"github.com/MayMistery/noscan/utils"
 	"runtime"
 	"runtime/debug"
 	"time"
@@ -20,16 +18,4 @@ func init() {
 func GarbageCollection() {
 	runtime.GC()
 	debug.FreeOSMemory()
-}
-
-func Exec() {
-	var cfg Configs
-
-	Flag(cfg)
-	scan.Scan(cfg)
-	if cfg.jsonOutput {
-		utils.OutputJsonResult(cfg.CIDRInfo)
-	} else {
-		//TODO add terminal output
-	}
 }

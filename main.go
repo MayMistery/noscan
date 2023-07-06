@@ -19,12 +19,26 @@ package main
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
+	"github.com/MayMistery/noscan/scan"
+	"github.com/MayMistery/noscan/utils"
 	"time"
 )
 
 func main() {
 	start := time.Now()
-	cmd.Exec()
+	Exec()
 	t := time.Now().Sub(start)
 	fmt.Printf("[*] Task done, Duration: %s\n", t)
+}
+
+func Exec() {
+	var cfg cmd.Configs
+
+	cmd.Flag(&cfg)
+	scan.Scan(cfg)
+	if cfg.JsonOutput {
+		utils.OutputJsonResult(cfg)
+	} else {
+		//TODO add terminal output
+	}
 }
