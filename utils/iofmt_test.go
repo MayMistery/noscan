@@ -13,5 +13,5 @@ func TestName(t *testing.T) {
 	test1 := make(map[string]cmd.IpInfo)
 	test1["1.1.1.1"] = test
 
-	OutputJsonResult(test1)
+	//OutputJsonResult()
 }

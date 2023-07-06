@@ -18,7 +18,7 @@ type Configs struct {
 	jsonOutput     bool
 	ciscn          bool
 	InputFilepath  string
-	outputFilepath string
+	OutputFilepath string
 	ScanType       string
 }
 

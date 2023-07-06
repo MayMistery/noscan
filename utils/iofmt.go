@@ -7,9 +7,10 @@ import (
 	"os"
 )
 
-func OutputJsonResult(ipInfos map[string]cmd.IpInfo) {
-
-	file, err := os.Create("res.json")
+func OutputJsonResult(config cmd.Configs) {
+	ipInfos := config.CIDRInfo
+	filepath := config.OutputFilepath
+	file, err := os.Create(filepath)
 	if err != nil {
 		fmt.Println("Failed to create file:", err)
 		return
