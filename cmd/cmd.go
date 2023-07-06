@@ -27,7 +27,9 @@ func Exec() {
 
 	Flag(cfg)
 	scan.Scan(cfg)
-	if cfg.jsonOutput == true {
+	if cfg.jsonOutput {
 		utils.OutputJsonResult(cfg.CIDRInfo)
+	} else {
+		//TODO add terminal output
 	}
 }

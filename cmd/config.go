@@ -18,6 +18,7 @@ type Configs struct {
 	jsonOutput bool
 	ciscn      bool
 	filepath   string
+	ScanType   string
 }
 
 type Command interface {

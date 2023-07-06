@@ -1,3 +1,3 @@
 package cmd
 
-// Todo trans target CIDR to lilist
+// Todo trans target CIDR to list

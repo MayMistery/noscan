@@ -1,5 +1,1 @@
-package scan
-
-func main() {
-
-}
+package rules
