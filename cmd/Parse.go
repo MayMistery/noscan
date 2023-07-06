@@ -17,9 +17,9 @@ noscan version: ` + version.Version + `
 
 func Flag() {
 	Banner()
-	flag.StringVar(&, "h", "", "IP address of the host you want to scan,for example: 192.168.11.11 | 192.168.11.11-255 | 192.168.11.11,192.168.11.12")
-	flag.Int64Var(&Timeout, "time", 3, "Set timeout")
-	flag.BoolVar(&Ping, "ping", false, "using ping replace icmp")
+	//flag.StringVar(&, "h", "", "IP address of the host you want to scan,for example: 192.168.11.11 | 192.168.11.11-255 | 192.168.11.11,192.168.11.12")
+	//flag.Int64Var(&Timeout, "time", 3, "Set timeout")
+	//flag.BoolVar(&Ping, "ping", false, "using ping replace icmp")
 
 	// TODO to add flags and corresponding var
 

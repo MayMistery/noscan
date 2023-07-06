@@ -1,17 +1,21 @@
 package cmd
 
-type portInfo struct {
-	port       string
-	protocol   string
-	serviceApp string
+type PortInfo struct {
+	Port       int      `json:"port"`
+	Protocol   string   `json:"protocol"`
+	ServiceApp []string `json:"service_app"`
 }
 
-type ipInfo struct {
-	host       string
-	services   []portInfo
-	deviceInfo string
-	honeypot   string
-	timestamp  string
+type IpInfo struct {
+	Host       string     `json:"host"`
+	Services   []PortInfo `json:"services"`
+	DeviceInfo string     `json:"deviceinfo"`
+	Honeypot   []string   `json:"honeypot"`
+	Timestamp  string     `json:"timestamp"`
+}
+
+type CIDRInfo struct {
+	IpInfo `json:""`
 }
 
 type Command interface {
