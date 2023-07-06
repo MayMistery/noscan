@@ -14,9 +14,7 @@ type IpInfo struct {
 	Timestamp  string     `json:"timestamp"`
 }
 
-type CIDRInfo struct {
-	IpInfo `json:""`
-}
+type CIDRInfo []IpInfo
 
 type Command interface {
 	//TODO

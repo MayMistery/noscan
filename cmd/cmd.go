@@ -19,3 +19,10 @@ func GarbageCollection() {
 	runtime.GC()
 	debug.FreeOSMemory()
 }
+
+func Exec() {
+	Flag()
+	//Parse()
+	//scan.Scan(CIDRInfo)
+	//utils.
+}
