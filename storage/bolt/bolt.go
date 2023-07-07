@@ -38,10 +38,10 @@ func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 	return &ipCache, nil
 }
 
-func InitDatabase(config cmd.Configs) {
+func InitDatabase() {
 	// 创建一个新的存储实例
 	var err error
-	cmd.DB, err = NewStorage(config.DBFilePath)
+	cmd.DB, err = NewStorage(cmd.Config.DBFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}

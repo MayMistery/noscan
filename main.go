@@ -33,17 +33,16 @@ func main() {
 }
 
 func Exec() {
-	var config cmd.Configs
 
-	cmd.Flag(&config)
-	bolt.InitDatabase(config)
+	cmd.Flag(&cmd.Config)
+	bolt.InitDatabase()
 
-	err := scan.Scan(config)
+	err := scan.Scan()
 	if err != nil {
 		//TODO Handle error
 	}
-	if config.JsonOutput {
-		utils.OutputJsonResult(config)
+	if cmd.Config.JsonOutput {
+		utils.OutputJsonResult(cmd.Config)
 	} else {
 		//TODO add terminal output
 	}

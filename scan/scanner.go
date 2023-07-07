@@ -39,15 +39,15 @@ func InitTarget(cfg cmd.Configs) error {
 	return nil
 }
 
-func Scan(config cmd.Configs) error {
-	err := InitTarget(config)
+func Scan() error {
+	err := InitTarget(cmd.Config)
 	if err != nil {
 		return err
 	}
-	AliveHosts = CheckLive(config)
-	ipList := config.CIDRInfo
+	AliveHosts = CheckLive(cmd.Config)
+	ipList := cmd.Config.CIDRInfo
 
-	switch config.ScanType {
+	switch cmd.Config.ScanType {
 	case "syn":
 		break
 	//TODO add scan type

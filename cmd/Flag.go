@@ -35,6 +35,8 @@ func Flag(config *Configs) {
 	flag.StringVar(&config.DBFilePath, "db", path.Join(exPath, "data/database.db"), "database file path")
 	flag.StringVar(&config.ScanType, "t", "tcp", "scan method, tcp | syn | fin | NULL")
 	flag.BoolVar(&config.Ping, "ping", false, "use system ping method to check host alive")
+	flag.StringVar(&config.Socks5Proxy, "proxy", "", "socket5 proxy")
+	flag.IntVar(&config.Threads, "thread", 666, "threads num")
 
 	// TODO to add flags and corresponding var
 
