@@ -3,6 +3,13 @@ package scan
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
+	"runtime"
+)
+
+var (
+	AliveHosts []string
+	ExistHosts = make(map[string]bool)
+	OS         = runtime.GOOS
 )
 
 func tcp(CIDRInfo map[string]cmd.IpInfo) {
@@ -19,11 +26,16 @@ func InitTarget(cfg cmd.Configs) error {
 	var ipPool cmd.IPPool
 	var ipPoolsFuncList []func() string
 	for _, cidrIp := range cidrIPs {
-		ipPool.SetPool(cidrIp)
+		err := ipPool.SetPool(cidrIp)
+		if err != nil {
+			return err
+		}
+		cmd.IPPoolsSize += ipPool.GetPoolSize()
+		cmd.IPNetPools = append(cmd.IPNetPools, ipPool)
 		ipPoolsFuncList = append(ipPoolsFuncList, ipPool.GetPool())
 	}
 
-	cmd.IpPools = cmd.GetPools(ipPoolsFuncList)
+	cmd.IPPools = cmd.GetPools(ipPoolsFuncList)
 	return nil
 }
 
@@ -32,6 +44,7 @@ func Scan(config cmd.Configs) error {
 	if err != nil {
 		return err
 	}
+	AliveHosts = CheckLive(config)
 	ipList := config.CIDRInfo
 
 	switch config.ScanType {

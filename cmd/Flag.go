@@ -32,8 +32,9 @@ func Flag(config *Configs) {
 	flag.BoolVar(&config.Ciscn, "d", true, "to complete Ciscn task")
 	flag.StringVar(&config.InputFilepath, "input", path.Join(exPath, "data/target"), "input file path")
 	flag.StringVar(&config.OutputFilepath, "output", path.Join(exPath, "result/result.json"), "output file path")
-	flag.StringVar(&config.ScanType, "t", "tcp", "scan method, tcp | syn | fin | NULL")
 	flag.StringVar(&config.DBFilePath, "db", path.Join(exPath, "data/database.db"), "database file path")
+	flag.StringVar(&config.ScanType, "t", "tcp", "scan method, tcp | syn | fin | NULL")
+	flag.BoolVar(&config.Ping, "ping", false, "use system ping method to check host alive")
 
 	// TODO to add flags and corresponding var
 

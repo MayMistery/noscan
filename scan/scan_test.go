@@ -11,6 +11,6 @@ func TestInitTarget(t *testing.T) {
 	cfg.InputFilepath = "../data/target"
 	InitTarget(cfg)
 	for i := 0; i < 513; i++ {
-		fmt.Println(cmd.IpPools())
+		fmt.Println(cmd.IPPools())
 	}
 }

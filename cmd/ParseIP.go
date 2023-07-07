@@ -10,8 +10,7 @@ import (
 )
 
 type IPPool struct {
-	Start net.IP
-	End   net.IP
+	ipNet *net.IPNet
 }
 
 func ReadIPAddressesFromFile(config Configs) ([]string, error) {
@@ -53,6 +52,16 @@ func IPRange(ipNet *net.IPNet) (net.IP, net.IP) {
 	return start, bcst
 }
 
+func InTarget(ip string) bool {
+	ipParsed := net.ParseIP(ip)
+	for _, ipPool := range IPNetPools {
+		if ipPool.ipNet.Contains(ipParsed) {
+			return true
+		}
+	}
+	return false
+}
+
 func GetPools(ipPoolFuncList []func() string) func() string {
 	return func() string {
 		for _, ipPoolFunc := range ipPoolFuncList {
@@ -65,24 +74,24 @@ func GetPools(ipPoolFuncList []func() string) func() string {
 	}
 }
 
-func (ipPool *IPPool) SetPool(cidrIp string) {
+func (ipPool *IPPool) SetPool(cidrIp string) error {
 	_, ipNet, err := net.ParseCIDR(cidrIp)
 	if err != nil {
 		fmt.Println("[-]Read ip fail", err)
-		return
+		return err
 	}
-	start, end := IPRange(ipNet)
-	ipPool.Start = start
-	ipPool.End = end
+	ipPool.ipNet = ipNet
+	return nil
 }
 
 func (ipPool IPPool) GetPool() func() string {
 	var counter int64 = 0
+	start, end := IPRange(ipPool.ipNet)
 	return func() string {
 		startIpInt := big.NewInt(0)
-		startIpInt.SetBytes(ipPool.Start.To4())
+		startIpInt.SetBytes(start.To4())
 		endIpInt := big.NewInt(0)
-		endIpInt.SetBytes(ipPool.End.To4())
+		endIpInt.SetBytes(end.To4())
 
 		nowIpInt := startIpInt.Int64() + counter
 		counter++
@@ -91,4 +100,13 @@ func (ipPool IPPool) GetPool() func() string {
 		}
 		return fmt.Sprintf("%d.%d.%d.%d", byte(nowIpInt>>24), byte(nowIpInt>>16), byte(nowIpInt>>8), byte(nowIpInt))
 	}
+}
+
+func (ipPool IPPool) GetPoolSize() int64 {
+	start, end := IPRange(ipPool.ipNet)
+	startIpInt := big.NewInt(0)
+	startIpInt.SetBytes(start.To4())
+	endIpInt := big.NewInt(0)
+	endIpInt.SetBytes(end.To4())
+	return endIpInt.Int64() - startIpInt.Int64()
 }
