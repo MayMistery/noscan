@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-// TODO add proxy
 func WrapperTcpWithTimeout(network, address string, timeout time.Duration) (net.Conn, error) {
 	d := &net.Dialer{Timeout: timeout}
 	return WrapperTCP(network, address, d)

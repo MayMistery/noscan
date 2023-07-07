@@ -4,136 +4,39 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"golang.org/x/net/icmp"
 	"net"
 	"os/exec"
+	"runtime"
 	"strings"
-	"sync"
 	"time"
 )
 
-var (
-	livewg sync.WaitGroup
-)
+func CheckLive(host string) bool {
 
-func CheckLive(config cmd.Configs) []string {
-	chanHosts := make(chan string, int(cmd.IPPoolsSize))
-	go func() {
-		for ip := range chanHosts {
-			if _, ok := ExistHosts[ip]; !ok && cmd.InTarget(ip) {
-				ExistHosts[ip] = true
-				if config.Ping == false {
-					fmt.Printf("(icmp) Target %-15s is alive\n", ip)
-				} else {
-					fmt.Printf("(ping) Target %-15s is alive\n", ip)
-				}
-				AliveHosts = append(AliveHosts, ip)
-			}
-			livewg.Done()
-		}
-	}()
-
-	if config.Ping == true {
+	if cmd.Config.Ping == true {
 		//Use system ping command
-		RunPing(chanHosts)
+		return ExecCommandPing(host)
 	} else {
-		//First try icmp with listening
-		conn, err := icmp.ListenPacket("ip4:icmp", "0.0.0.0")
+		//Try icmp without listening
+		fmt.Println("trying RunIcmp2")
+		conn, err := net.DialTimeout("ip4:icmp", "127.0.0.1", 3*time.Second)
+		defer func() {
+			if conn != nil {
+				conn.Close()
+			}
+		}()
 		if err == nil {
-			RunIcmp1(conn, chanHosts)
+			return IcmpAlive(host)
 		} else {
-			//Try icmp without listening
-			fmt.Println("trying RunIcmp2")
-			conn, err := net.DialTimeout("ip4:icmp", "127.0.0.1", 3*time.Second)
-			defer func() {
-				if conn != nil {
-					conn.Close()
-				}
-			}()
-			if err == nil {
-				RunIcmp2(chanHosts)
-			} else {
-				//Use system ping command
-				fmt.Println("The current user permissions unable to send icmp packets")
-				fmt.Println("start ping")
-				RunPing(chanHosts)
-			}
+			//Use system ping command
+			fmt.Println("The current user permissions unable to send icmp packets")
+			fmt.Println("start ping")
+			return ExecCommandPing(host)
 		}
 	}
-
-	livewg.Wait()
-	close(chanHosts)
-
-	return AliveHosts
 }
 
-func RunIcmp1(conn *icmp.PacketConn, chanHosts chan string) {
-	endflag := false
-	go func() {
-		for {
-			if endflag == true {
-				return
-			}
-			msg := make([]byte, 100)
-			_, sourceIP, _ := conn.ReadFrom(msg)
-			if sourceIP != nil {
-				livewg.Add(1)
-				chanHosts <- sourceIP.String()
-			}
-		}
-	}()
-
-	for host := cmd.IPPools(); host != ""; host = cmd.IPPools() {
-		dst, _ := net.ResolveIPAddr("ip", host)
-		IcmpByte := makemsg(host)
-		conn.WriteTo(IcmpByte, dst)
-	}
-	//根据hosts数量修改icmp监听时间
-	start := time.Now()
-	for {
-		if len(AliveHosts) == int(cmd.IPPoolsSize) {
-			break
-		}
-		since := time.Now().Sub(start)
-		var wait time.Duration
-		switch {
-		case int(cmd.IPPoolsSize) <= 256:
-			wait = time.Second * 3
-		default:
-			wait = time.Second * 6
-		}
-		if since > wait {
-			break
-		}
-	}
-	endflag = true
-	conn.Close()
-}
-
-func RunIcmp2(chanHosts chan string) {
-	var num int64 = 1000
-	if cmd.IPPoolsSize < num {
-		num = cmd.IPPoolsSize
-	}
-	var wg sync.WaitGroup
-	limiter := make(chan struct{}, num)
-	for host := cmd.IPPools(); host != ""; host = cmd.IPPools() {
-		wg.Add(1)
-		limiter <- struct{}{}
-		go func(host string) {
-			if icmpalive(host) {
-				livewg.Add(1)
-				chanHosts <- host
-			}
-			<-limiter
-			wg.Done()
-		}(host)
-	}
-	wg.Wait()
-	close(limiter)
-}
-
-func icmpalive(host string) bool {
+func IcmpAlive(host string) bool {
 	startTime := time.Now()
 	conn, err := net.DialTimeout("ip4:icmp", host, 6*time.Second)
 	defer func() {
@@ -160,36 +63,23 @@ func icmpalive(host string) bool {
 	return true
 }
 
-func RunPing(chanHosts chan string) {
-	var bsenv = ""
-	if OS != "windows" {
-		bsenv = "/bin/bash"
-	}
-	var wg sync.WaitGroup
-	limiter := make(chan struct{}, 50)
-	for host := cmd.IPPools(); host != ""; host = cmd.IPPools() {
-		wg.Add(1)
-		limiter <- struct{}{}
-		go func(host string) {
-			if ExecCommandPing(host, bsenv) {
-				livewg.Add(1)
-				chanHosts <- host
-			}
-			<-limiter
-			wg.Done()
-		}(host)
-	}
-	wg.Wait()
-}
-
-func ExecCommandPing(ip string, bsenv string) bool {
+func ExecCommandPing(host string) bool {
 	var command *exec.Cmd
-	if OS == "windows" {
-		command = exec.Command("cmd", "/c", "ping -n 1 -w 1 "+ip+" && echo true || echo false") //ping -c 1 -i 0.5 -t 4 -W 2 -w 5 "+ip+" >/dev/null && echo true || echo false"
-	} else if OS == "linux" {
-		command = exec.Command(bsenv, "-c", "ping -c 1 -w 1 "+ip+" >/dev/null && echo true || echo false") //ping -c 1 -i 0.5 -t 4 -W 2 -w 5 "+ip+" >/dev/null && echo true || echo false"
-	} else if OS == "darwin" {
-		command = exec.Command(bsenv, "-c", "ping -c 1 -W 1 "+ip+" >/dev/null && echo true || echo false") //ping -c 1 -i 0.5 -t 4 -W 2 -w 5 "+ip+" >/dev/null && echo true || echo false"
+	switch runtime.GOOS {
+	case "windows":
+		command = exec.Command("cmd", "/c", "ping -n 1 -w 1 "+host+" && echo true || echo false")
+	case "linux":
+		command = exec.Command("/bin/bash", "-c", "ping -c 1 -w 1 "+host+" >/dev/null && echo true || echo false")
+	case "darwin":
+		command = exec.Command("/bin/bash", "-c", "ping -c 1 -W 1 "+host+" >/dev/null && echo true || echo false")
+	case "freebsd":
+		command = exec.Command("ping", "-c", "1", "-W", "200", host)
+	case "openbsd":
+		command = exec.Command("ping", "-c", "1", "-w", "200", host)
+	case "netbsd":
+		command = exec.Command("ping", "-c", "1", "-w", "2", host)
+	default:
+		command = exec.Command("ping", "-c", "1", host)
 	}
 	outinfo := bytes.Buffer{}
 	command.Stdout = &outinfo

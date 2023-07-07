@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/asdine/storm/v3 v3.2.1
 	github.com/boltdb/bolt v1.3.1
+	github.com/lcvvvv/gonmap v1.3.4
 )
 
 require (

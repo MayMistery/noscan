@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 )
 
 func Banner() {
@@ -24,6 +25,7 @@ func Flag(config *Configs) {
 		panic(err)
 	}
 	exPath := filepath.Dir(ex)
+	var timeout int
 
 	Banner()
 	//flag.StringVar(&, "h", "", "IP address of the host you want to scan,for example: 192.168.11.11 | 192.168.11.11-255 | 192.168.11.11,192.168.11.12")
@@ -37,7 +39,10 @@ func Flag(config *Configs) {
 	flag.BoolVar(&config.Ping, "ping", false, "use system ping method to check host alive")
 	flag.StringVar(&config.Socks5Proxy, "proxy", "", "socket5 proxy")
 	flag.IntVar(&config.Threads, "thread", 666, "threads num")
+	flag.IntVar(&timeout, "timeout", 2, "connect time out")
+	flag.BoolVar(&config.DeepInspection, "simple", true, "close deep identify")
 
+	config.Timeout = time.Duration(timeout) * time.Second
 	// TODO to add flags and corresponding var
 
 	flag.PrintDefaults()

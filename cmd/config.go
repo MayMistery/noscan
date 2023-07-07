@@ -1,6 +1,9 @@
 package cmd
 
-import "github.com/MayMistery/noscan/storage/bolt"
+import (
+	"github.com/MayMistery/noscan/storage/bolt"
+	"time"
+)
 
 type PortInfo struct {
 	Port       int      `json:"port"`
@@ -26,6 +29,8 @@ type Configs struct {
 	Ping           bool
 	Socks5Proxy    string
 	Threads        int
+	Timeout        time.Duration
+	DeepInspection bool
 }
 
 type Command interface {

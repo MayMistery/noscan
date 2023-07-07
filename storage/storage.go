@@ -7,5 +7,4 @@ import (
 type IpCache struct {
 	Ip     string `storm:"id,increment"`
 	IpInfo cmd.IpInfo
-	Mark   bool
 }
