@@ -8,10 +8,10 @@ import (
 	"testing"
 )
 
-func TestDb(t *testing.T) {
+func TestOutputDb(t *testing.T) {
 	var testConfig cmd.Configs
 	testConfig.DBFilePath = "../../data/database.db"
-	InitDatabase(testConfig)
+	InitDatabase()
 	db, err := bolt.Open("database.ipdb", 0666, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -34,4 +34,8 @@ func TestDb(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func TestStorage_UpdateCache(t *testing.T) {
+
 }

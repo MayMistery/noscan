@@ -47,7 +47,7 @@ func (s *Storage) UpdateCache(ipCache storage.IpCache) error {
 func InitDatabase() {
 	// 创建一个新的存储实例
 	var err error
-	cmd.DB, err = NewStorage(cmd.Config.DBFilePath)
+	storage.DB, err = NewStorage(cmd.Config.DBFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,5 +56,5 @@ func InitDatabase() {
 		if err != nil {
 			//TODO add errorLog
 		}
-	}(cmd.DB)
+	}(storage.DB)
 }

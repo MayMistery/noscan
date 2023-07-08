@@ -47,7 +47,7 @@ func HandlerOpen(value Address) {
 			Timestamp:  time.Now().String(),
 		},
 	}
-	cmd.DB.SaveIpCache(ipCache)
+	storage.DB.SaveIpCache(ipCache)
 }
 
 func HandlerNotMatched(value Address, response string) {

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/MayMistery/noscan/storage/bolt"
 	"time"
 )
 
@@ -60,4 +59,3 @@ var Config Configs
 var IPPools func() string
 var IPPoolsSize int64 = 0
 var IPNetPools []IPPool
-var DB *bolt.Storage
