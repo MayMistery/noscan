@@ -2,9 +2,9 @@ package scan
 
 import (
 	"github.com/MayMistery/noscan/cmd"
+	"github.com/MayMistery/noscan/scan/gonmap"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/MayMistery/noscan/utils"
-	"github.com/lcvvvv/gonmap"
 	"time"
 )
 

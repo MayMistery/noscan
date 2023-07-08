@@ -38,6 +38,12 @@ func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 	return &ipCache, nil
 }
 
+func (s *Storage) UpdateCache(ipCache storage.IpCache) error {
+	return s.ipdb.Update(&ipCache)
+
+	//TODO further check
+}
+
 func InitDatabase() {
 	// 创建一个新的存储实例
 	var err error
