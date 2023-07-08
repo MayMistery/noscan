@@ -45,7 +45,7 @@ func Scan() error {
 	}
 
 	scanPool := ScanPool()
-	scanPool.Run()
+	go scanPool.Run()
 	for host := cmd.IPPools(); host != ""; host = cmd.IPPools() {
 		scanPool.Push(host)
 	}
@@ -54,12 +54,12 @@ func Scan() error {
 }
 
 func ScanPool() *utils.Pool {
-	scanPool := utils.NewPool(cmd.Config.Threads)
+	scanPool := utils.NewPool(cmd.Config.Threads/4 + 1)
+	portScanPool := PortScanPool()
+	go portScanPool.Run()
 	scanPool.Function = func(input interface{}) {
 		host := input.(string)
 		if CheckLive(host) {
-			portScanPool := PortScanPool()
-			portScanPool.Run()
 			//TODO port parser
 			for _, port := range cmd.Ports {
 				portScanPool.Push(Address{net.ParseIP(host), port})

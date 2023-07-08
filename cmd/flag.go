@@ -3,9 +3,9 @@ package cmd
 import (
 	"flag"
 	version "github.com/MayMistery/noscan/.version"
-	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -20,11 +20,8 @@ noscan version: ` + version.Version + `
 }
 
 func Flag(config *Configs) {
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	exPath := filepath.Dir(ex)
+	_, ex, _, _ := runtime.Caller(0)
+	exPath := path.Join(filepath.Dir(ex), "..")
 	var timeout int
 
 	Banner()
@@ -46,7 +43,7 @@ func Flag(config *Configs) {
 	config.Timeout = time.Duration(timeout) * time.Second
 	// TODO to add flags and corresponding var
 
-	flag.PrintDefaults()
+	//flag.PrintDefaults()
 
 	flag.Parse()
 }

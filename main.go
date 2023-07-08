@@ -46,4 +46,8 @@ func Exec() {
 	} else {
 		//TODO add terminal output
 	}
+
+	defer func() {
+		bolt.CloseDatabase()
+	}()
 }

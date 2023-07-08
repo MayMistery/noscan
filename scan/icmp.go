@@ -18,7 +18,6 @@ func CheckLive(host string) bool {
 		return ExecCommandPing(host)
 	} else {
 		//Try icmp without listening
-		fmt.Println("trying RunIcmp2")
 		conn, err := net.DialTimeout("ip4:icmp", "127.0.0.1", 3*time.Second)
 		defer func() {
 			if conn != nil {

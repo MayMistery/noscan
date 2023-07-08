@@ -10,11 +10,15 @@ import (
 )
 
 var (
-	Result     map[string]cmd.IpInfo
-	PortScaned map[string]map[int]bool
+	Result     = make(map[string]cmd.IpInfo)
+	PortScaned = make(map[string]map[int]bool)
 )
 
-func OutputJsonResult() {
+func InitResultMap() {
+	//TODO Init the result map from databse
+}
+
+func OutputResultMap() {
 	ipInfos := Result
 	filepath := cmd.Config.OutputFilepath
 	file, err := os.Create(filepath)
@@ -36,7 +40,12 @@ func OutputJsonResult() {
 }
 
 func AddPortInfo(host string, info cmd.PortInfo) {
-	if ipInfo, ok1 := Result[host]; ok1 {
+	if _, ok := PortScaned[host]; !ok {
+		PortScaned[host] = make(map[int]bool)
+	}
+
+	ipInfo, ok1 := Result[host]
+	if ok1 {
 		if _, ok2 := PortScaned[host][info.Port]; ok2 {
 			UpdatePortInfo(host, info)
 		} else {
@@ -48,6 +57,7 @@ func AddPortInfo(host string, info cmd.PortInfo) {
 		ipInfo.Services = []cmd.PortInfo{info}
 		PortScaned[host][info.Port] = true
 	}
+	Result[host] = ipInfo
 	bolt.DB.UpdateCache(storage.IpCache{
 		Ip:     host,
 		IpInfo: Result[host],

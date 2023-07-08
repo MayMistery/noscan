@@ -10,7 +10,7 @@ import (
 var DB *Storage
 
 type Storage struct {
-	ipdb *storm.DB
+	Ipdb *storm.DB
 }
 
 func NewStorage(path string) (*Storage, error) {
@@ -19,20 +19,20 @@ func NewStorage(path string) (*Storage, error) {
 		return nil, err
 	}
 
-	return &Storage{ipdb: db}, nil
+	return &Storage{Ipdb: db}, nil
 }
 
 func (s *Storage) Close() error {
-	return s.ipdb.Close()
+	return s.Ipdb.Close()
 }
 
 func (s *Storage) SaveIpCache(ipCache storage.IpCache) error {
-	return s.ipdb.Save(&ipCache)
+	return s.Ipdb.Save(&ipCache)
 }
 
 func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 	var ipCache storage.IpCache
-	err := s.ipdb.One("Ip", ip, &ipCache)
+	err := s.Ipdb.One("Ip", ip, &ipCache)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,10 @@ func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 }
 
 func (s *Storage) UpdateCache(ipCache storage.IpCache) error {
-	return s.ipdb.Update(&ipCache)
+	if _, err := s.GetIpCache(ipCache.Ip); err != nil {
+		return s.SaveIpCache(ipCache)
+	}
+	return s.Ipdb.Update(&ipCache)
 
 	//TODO further check
 }
@@ -53,6 +56,9 @@ func InitDatabase() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func CloseDatabase() {
 	defer func(db *Storage) {
 		err := db.Close()
 		if err != nil {

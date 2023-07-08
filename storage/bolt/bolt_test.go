@@ -12,10 +12,9 @@ import (
 )
 
 func TestOutputDb(t *testing.T) {
-	var testConfig cmd.Configs
-	testConfig.DBFilePath = "../../data/database.db"
+	cmd.Config.DBFilePath = "../../data/database.db"
 	InitDatabase()
-	db, err := bolt.Open("database.ipdb", 0666, nil)
+	db, err := bolt.Open(cmd.Config.DBFilePath, 0666, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
