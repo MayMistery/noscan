@@ -30,6 +30,7 @@ func Flag(config *Configs) {
 	Banner()
 	//flag.StringVar(&, "h", "", "IP address of the host you want to scan,for example: 192.168.11.11 | 192.168.11.11-255 | 192.168.11.11,192.168.11.12")
 	//flag.Int64Var(&Timeout, "time", 3, "Set timeout")
+	flag.StringVar(&config.Ports, "port", "all", "Ports to scan, choices: all | top1000 | top10000 | <port>[-<port>][,<ports>]")
 	flag.BoolVar(&config.JsonOutput, "json", true, "using json output")
 	flag.BoolVar(&config.Ciscn, "d", true, "to complete Ciscn task")
 	flag.StringVar(&config.InputFilepath, "input", path.Join(exPath, "data/target"), "input file path")

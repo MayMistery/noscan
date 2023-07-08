@@ -3,10 +3,7 @@ package scan
 import (
 	"github.com/MayMistery/noscan/cmd"
 	"github.com/MayMistery/noscan/scan/gonmap"
-	"github.com/MayMistery/noscan/storage"
-	"github.com/MayMistery/noscan/storage/bolt"
 	"github.com/MayMistery/noscan/utils"
-	"time"
 )
 
 func PortScanPool() *utils.Pool {
@@ -23,7 +20,7 @@ func PortScanPool() *utils.Pool {
 		case gonmap.Open:
 			HandlerOpen(value)
 		case gonmap.NotMatched:
-			HandlerNotMatched(value, response.Raw)
+			HandlerNotMatched(value)
 		case gonmap.Matched:
 			HandlerMatched(value, response)
 		}
@@ -39,27 +36,23 @@ func HandlerOpen(value Address) {
 		Protocol:   protocol,
 		ServiceApp: nil,
 	}
-	ipCache := storage.IpCache{
-		Ip: value.IP.String(),
-		IpInfo: cmd.IpInfo{
-			Services:   []cmd.PortInfo{portInfo},
-			DeviceInfo: "",
-			Honeypot:   nil,
-			Timestamp:  time.Now().String(),
-		},
-	}
-	bolt.DB.SaveIpCache(ipCache)
+	utils.AddPortInfo(value.IP.String(), portInfo)
 }
 
-func HandlerNotMatched(value Address, response string) {
-
+func HandlerNotMatched(value Address) {
+	portInfo := cmd.PortInfo{
+		Port:     value.Port,
+		Protocol: "unknow",
+	}
+	utils.AddPortInfo(value.IP.String(), portInfo)
 }
 
 func HandlerMatched(value Address, response *gonmap.Response) {
 	protocol := response.FingerPrint.Service
-	ipInfo := cmd.PortInfo{
+	portInfo := cmd.PortInfo{
 		Port:     value.Port,
 		Protocol: protocol,
 	}
+	utils.AddPortInfo(value.IP.String(), portInfo)
 	//TODO Further application probing
 }

@@ -42,7 +42,7 @@ func Exec() {
 		//TODO Handle error
 	}
 	if cmd.Config.JsonOutput {
-		utils.OutputJsonResult(cmd.Config)
+		utils.OutputJsonResult()
 	} else {
 		//TODO add terminal output
 	}

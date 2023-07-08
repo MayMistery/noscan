@@ -12,10 +12,6 @@ type Address struct {
 	Port int
 }
 
-func tcp(CIDRInfo map[string]cmd.IpInfo) {
-	//TODO scan implementation details.
-}
-
 func InitTarget(cfg cmd.Configs) error {
 	cidrIPs, err := cmd.ReadIPAddressesFromFile(cfg)
 	if err != nil {
@@ -36,6 +32,9 @@ func InitTarget(cfg cmd.Configs) error {
 	}
 
 	cmd.IPPools = cmd.GetPools(ipPoolsFuncList)
+
+	//Init ports array
+	cmd.Ports = cmd.ParsePort()
 	return nil
 }
 
@@ -62,7 +61,7 @@ func ScanPool() *utils.Pool {
 			portScanPool := PortScanPool()
 			portScanPool.Run()
 			//TODO port parser
-			for _, port := range ports {
+			for _, port := range cmd.Ports {
 				portScanPool.Push(Address{net.ParseIP(host), port})
 			}
 		}
