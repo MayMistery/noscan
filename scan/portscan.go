@@ -4,6 +4,7 @@ import (
 	"github.com/MayMistery/noscan/cmd"
 	"github.com/MayMistery/noscan/scan/gonmap"
 	"github.com/MayMistery/noscan/storage"
+	"github.com/MayMistery/noscan/storage/bolt"
 	"github.com/MayMistery/noscan/utils"
 	"time"
 )
@@ -47,7 +48,7 @@ func HandlerOpen(value Address) {
 			Timestamp:  time.Now().String(),
 		},
 	}
-	storage.DB.SaveIpCache(ipCache)
+	bolt.DB.SaveIpCache(ipCache)
 }
 
 func HandlerNotMatched(value Address, response string) {
