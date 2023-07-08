@@ -24,6 +24,7 @@ type Configs struct {
 	InputFilepath  string
 	OutputFilepath string
 	DBFilePath     string
+	RulesFilePath  string
 	ScanType       string
 	Ping           bool
 	Socks5Proxy    string

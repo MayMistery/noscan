@@ -36,13 +36,14 @@ func Exec() {
 
 	cmd.Flag(&cmd.Config)
 	bolt.InitDatabase()
+	utils.InitResultMap()
 
 	err := scan.Scan()
 	if err != nil {
 		//TODO Handle error
 	}
 	if cmd.Config.JsonOutput {
-		utils.OutputJsonResult()
+		utils.OutputResultMap()
 	} else {
 		//TODO add terminal output
 	}
