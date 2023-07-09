@@ -49,6 +49,24 @@ func (s *Storage) UpdateCache(ipCache storage.IpCache) error {
 	//TODO further check
 }
 
+func (s *Storage) UpdateServiceInfo(host string, port int, services *cmd.PortInfo) error {
+	ipCache, err := s.GetIpCache(host)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(ipCache.Services); i++ {
+		if ipCache.Services[i].Port == port {
+			ipCache.Services[i] = &storage.PortInfoStore{
+				PortInfo: services,
+				Banner:   ipCache.Services[i].Banner,
+			}
+			break
+		}
+	}
+	return s.Ipdb.Update(ipCache)
+}
+
 func InitDatabase() {
 	// 创建一个新的存储实例
 	var err error

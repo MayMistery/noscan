@@ -27,7 +27,7 @@ type Configs struct {
 	RulesFilePath  string
 	ScanType       string
 	Ping           bool
-	Socks5Proxy    string
+	Proxy          string
 	Threads        int
 	Timeout        time.Duration
 	DeepInspection bool

@@ -1,9 +1,16 @@
 package scan
 
 import (
+	"fmt"
 	"github.com/MayMistery/noscan/cmd"
 	"github.com/MayMistery/noscan/scan/scanlib"
 	"github.com/MayMistery/noscan/utils"
+	"github.com/lcvvvv/appfinger"
+	"github.com/lcvvvv/simplehttp"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
 )
 
 func PortScanPool() *utils.Pool {
@@ -18,19 +25,22 @@ func PortScanPool() *utils.Pool {
 		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, 100*cmd.Config.Timeout)
 		switch status {
 		case scanlib.Open:
-			HandlerOpen(value)
 		case scanlib.NotMatched:
-			HandlerNotMatched(value, response)
 		case scanlib.Matched:
-			HandlerMatched(value, response)
+		case gonmap.Open:
+			PortHandlerOpen(value)
+		case gonmap.NotMatched:
+			PortHandlerNotMatched(value, response)
+		case gonmap.Matched:
+			PortHandlerMatched(value, response)
 		}
 	}
 
 	return portScanPool
 }
 
-func HandlerOpen(value Address) {
-	protocol := scanlib.GuessProtocol(value.Port)
+func PortHandlerOpen(value Address) {
+	protocol := gonmap.GuessProtocol(value.Port)
 	portInfo := &cmd.PortInfo{
 		Port:       value.Port,
 		Protocol:   protocol,
@@ -39,24 +49,69 @@ func HandlerOpen(value Address) {
 	utils.AddPortInfo(value.IP.String(), portInfo, nil)
 }
 
-func HandlerNotMatched(value Address, response *scanlib.Response) {
+func PortHandlerNotMatched(value Address, response *gonmap.Response) {
 	portInfo := &cmd.PortInfo{
 		Port:     value.Port,
-		Protocol: "unknow",
+		Protocol: "c",
 	}
 	utils.AddPortInfo(value.IP.String(), portInfo, response)
 }
 
-func HandlerMatched(value Address, response *scanlib.Response) {
+func PortHandlerMatched(value Address, response *gonmap.Response) {
 	protocol := response.FingerPrint.Service
-	portInfo := &cmd.PortInfo{
-		Port:     value.Port,
-		Protocol: protocol,
+	var services []string
+	if product := getProductVersionFromNmap(response); product != "" {
+		services = []string{product}
 	}
-	//TODO Further application probing
-	if protocol == "http" || protocol == "https" {
-
+	portInfo := &cmd.PortInfo{
+		Port:       value.Port,
+		Protocol:   protocol,
+		ServiceApp: services,
 	}
 
 	utils.AddPortInfo(value.IP.String(), portInfo, response)
+	URLRaw := fmt.Sprintf("%s://%s:%d", protocol, value.IP.String(), value.Port)
+	URL, _ := url.Parse(URLRaw)
+	if appfinger.SupportCheck(URL.Scheme) == true {
+		pushURLTarget(URL, response)
+		return
+	}
+}
+
+func pushURLTarget(URL *url.URL, response *gonmap.Response) {
+	var cli *http.Client
+	//判断是否初始化client
+	if cmd.Config.Proxy != "" || cmd.Config.Timeout != 3*time.Second {
+		cli = simplehttp.NewClient()
+	}
+	//判断是否需要设置代理
+	if cmd.Config.Proxy != "" {
+		simplehttp.SetProxy(cli, cmd.Config.Proxy)
+	}
+	//判断是否需要设置超时参数
+	if cmd.Config.Timeout != 3*time.Second {
+		simplehttp.SetTimeout(cli, cmd.Config.Timeout)
+	}
+
+	HttpScanner.Push(HttpTarget{URL, response, nil, cli})
+}
+
+func getProductVersionFromNmap(response *gonmap.Response) string {
+	var (
+		version string
+		product string
+	)
+	if response.FingerPrint.ProductName == "" {
+		return ""
+	} else {
+		product = response.FingerPrint.ProductName
+	}
+
+	if response.FingerPrint.Version != "" {
+		version = response.FingerPrint.Version
+	} else {
+		version = "N"
+	}
+
+	return strings.Join([]string{product, version}, "/")
 }

@@ -25,7 +25,7 @@ func InitResultMap() {
 		log.Printf("Failed to retrieve data from the database: %v\n", err)
 		return
 	}
-	fmt.Println(ips)
+	//fmt.Println(ips)
 	// Populate the Result and PortScaned maps
 	for _, ip := range ips {
 		// Create a new IpInfo instance
@@ -115,7 +115,18 @@ func AddPortInfo(host string, info *cmd.PortInfo, banner *scanlib.Response) {
 func updatePortInfo(host string, info *cmd.PortInfo) {
 	for i := 0; i < len(Result[host].Services); i++ {
 		if Result[host].Services[i].Port == info.Port {
+			info.ServiceApp = RemoveDuplicateStringArr(append(info.ServiceApp, Result[host].Services[i].ServiceApp...))
 			Result[host].Services[i] = info
+			return
+		}
+	}
+}
+
+func UpdateServiceInfo(host string, port int, serviceInfo []string) {
+	for i := 0; i < len(Result[host].Services); i++ {
+		if Result[host].Services[i].Port == port {
+			Result[host].Services[i].ServiceApp = RemoveDuplicateStringArr(append(Result[host].Services[i].ServiceApp, serviceInfo...))
+			bolt.DB.UpdateServiceInfo(host, port, Result[host].Services[i])
 			return
 		}
 	}

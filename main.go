@@ -22,6 +22,8 @@ import (
 	"github.com/MayMistery/noscan/scan"
 	"github.com/MayMistery/noscan/storage/bolt"
 	"github.com/MayMistery/noscan/utils"
+	"github.com/lcvvvv/appfinger"
+	"os"
 	"time"
 )
 
@@ -38,9 +40,16 @@ func Exec() {
 	bolt.InitDatabase()
 	utils.InitResultMap()
 
+	fs, _ := os.Open(cmd.Config.RulesFilePath)
+	if n, err := appfinger.InitDatabaseFS(fs); err != nil {
+		fmt.Println("[-]指纹库加载失败，请检查【fingerprint.txt】文件", err)
+	} else {
+		fmt.Printf("[+]成功加载HTTP指纹:[%d]条", n)
+	}
+
 	err := scan.Scan()
 	if err != nil {
-		//TODO Handle error
+		fmt.Println("[-]Scan error", err)
 	}
 	if cmd.Config.JsonOutput {
 		utils.OutputResultMap()
