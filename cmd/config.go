@@ -11,10 +11,10 @@ type PortInfo struct {
 }
 
 type IpInfo struct {
-	Services   []PortInfo `json:"services"`
-	DeviceInfo string     `json:"deviceinfo"`
-	Honeypot   []string   `json:"honeypot"`
-	Timestamp  string     `json:"timestamp"`
+	Services   []*PortInfo `json:"services"`
+	DeviceInfo string      `json:"deviceinfo"`
+	Honeypot   []string    `json:"honeypot"`
+	Timestamp  string      `json:"timestamp"`
 }
 
 type Configs struct {

@@ -20,7 +20,7 @@ func PortScanPool() *utils.Pool {
 		case gonmap.Open:
 			HandlerOpen(value)
 		case gonmap.NotMatched:
-			HandlerNotMatched(value)
+			HandlerNotMatched(value, response)
 		case gonmap.Matched:
 			HandlerMatched(value, response)
 		}
@@ -31,28 +31,28 @@ func PortScanPool() *utils.Pool {
 
 func HandlerOpen(value Address) {
 	protocol := gonmap.GuessProtocol(value.Port)
-	portInfo := cmd.PortInfo{
+	portInfo := &cmd.PortInfo{
 		Port:       value.Port,
 		Protocol:   protocol,
 		ServiceApp: nil,
 	}
-	utils.AddPortInfo(value.IP.String(), portInfo)
+	utils.AddPortInfo(value.IP.String(), portInfo, nil)
 }
 
-func HandlerNotMatched(value Address) {
-	portInfo := cmd.PortInfo{
+func HandlerNotMatched(value Address, response *gonmap.Response) {
+	portInfo := &cmd.PortInfo{
 		Port:     value.Port,
 		Protocol: "unknow",
 	}
-	utils.AddPortInfo(value.IP.String(), portInfo)
+	utils.AddPortInfo(value.IP.String(), portInfo, response)
 }
 
 func HandlerMatched(value Address, response *gonmap.Response) {
 	protocol := response.FingerPrint.Service
-	portInfo := cmd.PortInfo{
+	portInfo := &cmd.PortInfo{
 		Port:     value.Port,
 		Protocol: protocol,
 	}
-	utils.AddPortInfo(value.IP.String(), portInfo)
+	utils.AddPortInfo(value.IP.String(), portInfo, response)
 	//TODO Further application probing
 }

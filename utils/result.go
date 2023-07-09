@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
+	"github.com/MayMistery/noscan/scan/gonmap"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/MayMistery/noscan/storage/bolt"
 	"os"
@@ -39,7 +40,7 @@ func OutputResultMap() {
 	fmt.Println("JSON file has been created.")
 }
 
-func AddPortInfo(host string, info cmd.PortInfo) {
+func AddPortInfo(host string, info *cmd.PortInfo, banner *gonmap.Response) {
 	if _, ok := PortScaned[host]; !ok {
 		PortScaned[host] = make(map[int]bool)
 	}
@@ -54,17 +55,22 @@ func AddPortInfo(host string, info cmd.PortInfo) {
 		}
 	} else {
 		ipInfo = cmd.IpInfo{}
-		ipInfo.Services = []cmd.PortInfo{info}
+		ipInfo.Services = []*cmd.PortInfo{info}
 		PortScaned[host][info.Port] = true
 	}
 	Result[host] = ipInfo
 	bolt.DB.UpdateCache(storage.IpCache{
-		Ip:     host,
-		IpInfo: Result[host],
+		Ip: host,
+		Services: []*storage.PortInfoStore{{
+			PortInfo: info,
+			Banner:   banner,
+		}},
+		DeviceInfo: Result[host].DeviceInfo,
+		Honeypot:   Result[host].Honeypot,
 	})
 }
 
-func UpdatePortInfo(host string, info cmd.PortInfo) {
+func UpdatePortInfo(host string, info *cmd.PortInfo) {
 	for i := 0; i < len(Result[host].Services); i++ {
 		if Result[host].Services[i].Port == info.Port {
 			Result[host].Services[i] = info

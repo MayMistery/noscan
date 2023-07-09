@@ -3,6 +3,7 @@ package bolt
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
+	"github.com/MayMistery/noscan/scan/gonmap"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/boltdb/bolt"
 	"github.com/stretchr/testify/assert"
@@ -59,20 +60,19 @@ func TestUpdateCache(t *testing.T) {
 
 	// 准备测试数据
 	ip := "127.0.0.1"
-	ipCache := storage.IpCache{
-		Ip: ip,
-		IpInfo: cmd.IpInfo{
-			Services: []cmd.PortInfo{
-				{
-					Port:       8080,
-					Protocol:   "tcp",
-					ServiceApp: []string{"http"},
-				},
-			},
-			DeviceInfo: "Device 1",
-			Honeypot:   []string{"Honeypot 1"},
-			Timestamp:  "2023-07-08",
+	portInfoStore := &storage.PortInfoStore{
+		PortInfo: &cmd.PortInfo{
+			Port:       8080,
+			Protocol:   "tcp",
+			ServiceApp: []string{"http"},
 		},
+		Banner: &gonmap.Response{},
+	}
+	ipCache := storage.IpCache{
+		Ip:         ip,
+		Services:   []*storage.PortInfoStore{portInfoStore},
+		DeviceInfo: "Device 1",
+		Honeypot:   []string{"Honeypot 1"},
 	}
 
 	// 保存测试数据到数据库
@@ -83,7 +83,7 @@ func TestUpdateCache(t *testing.T) {
 	}
 
 	// 修改测试数据
-	ipCache.IpInfo.DeviceInfo = "Updated Device"
+	ipCache.DeviceInfo = "Updated Device"
 
 	// 更新缓存
 	err = db.UpdateCache(ipCache)
@@ -100,7 +100,7 @@ func TestUpdateCache(t *testing.T) {
 	}
 
 	// 验证数据是否正确更新
-	assert.Equal(t, "Updated Device", updatedCache.IpInfo.DeviceInfo, "Device info should be updated")
+	assert.Equal(t, "Updated Device", updatedCache.DeviceInfo, "Device info should be updated")
 }
 
 func cleanupDBFile(filePath string) error {
