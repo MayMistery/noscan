@@ -1,4 +1,4 @@
-package gonmap
+package scanlib
 
 type FingerPrint struct {
 	ProbeName        string

@@ -1,4 +1,4 @@
-package gonmap
+package scanlib
 
 var nmapServiceProbes = `
 # Nmap service detection probe list -*- mode: fundamental; -*-

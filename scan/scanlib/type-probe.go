@@ -1,9 +1,9 @@
-package gonmap
+package scanlib
 
 import (
 	"errors"
 	"fmt"
-	"github.com/MayMistery/noscan/scan/gonmap/simplenet"
+	"github.com/MayMistery/noscan/scan/scanlib/simplenet"
 	"regexp"
 	"strconv"
 	"strings"

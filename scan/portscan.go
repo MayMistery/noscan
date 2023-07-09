@@ -2,14 +2,14 @@ package scan
 
 import (
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/gonmap"
+	"github.com/MayMistery/noscan/scan/scanlib"
 	"github.com/MayMistery/noscan/utils"
 )
 
 func PortScanPool() *utils.Pool {
 	portScanPool := utils.NewPool(cmd.Config.Threads)
 	portScanPool.Function = func(in interface{}) {
-		nmap := gonmap.New()
+		nmap := scanlib.New()
 		nmap.SetTimeout(cmd.Config.Timeout)
 		if cmd.Config.DeepInspection == true {
 			nmap.OpenDeepIdentify()
@@ -17,11 +17,11 @@ func PortScanPool() *utils.Pool {
 		value := in.(Address)
 		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, 100*cmd.Config.Timeout)
 		switch status {
-		case gonmap.Open:
+		case scanlib.Open:
 			HandlerOpen(value)
-		case gonmap.NotMatched:
+		case scanlib.NotMatched:
 			HandlerNotMatched(value, response)
-		case gonmap.Matched:
+		case scanlib.Matched:
 			HandlerMatched(value, response)
 		}
 	}
@@ -30,7 +30,7 @@ func PortScanPool() *utils.Pool {
 }
 
 func HandlerOpen(value Address) {
-	protocol := gonmap.GuessProtocol(value.Port)
+	protocol := scanlib.GuessProtocol(value.Port)
 	portInfo := &cmd.PortInfo{
 		Port:       value.Port,
 		Protocol:   protocol,
@@ -39,7 +39,7 @@ func HandlerOpen(value Address) {
 	utils.AddPortInfo(value.IP.String(), portInfo, nil)
 }
 
-func HandlerNotMatched(value Address, response *gonmap.Response) {
+func HandlerNotMatched(value Address, response *scanlib.Response) {
 	portInfo := &cmd.PortInfo{
 		Port:     value.Port,
 		Protocol: "unknow",
@@ -47,7 +47,7 @@ func HandlerNotMatched(value Address, response *gonmap.Response) {
 	utils.AddPortInfo(value.IP.String(), portInfo, response)
 }
 
-func HandlerMatched(value Address, response *gonmap.Response) {
+func HandlerMatched(value Address, response *scanlib.Response) {
 	protocol := response.FingerPrint.Service
 	portInfo := &cmd.PortInfo{
 		Port:     value.Port,

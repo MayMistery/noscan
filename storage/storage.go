@@ -2,12 +2,12 @@ package storage
 
 import (
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/gonmap"
+	"github.com/MayMistery/noscan/scan/scanlib"
 )
 
 type PortInfoStore struct {
 	*cmd.PortInfo
-	Banner *gonmap.Response
+	Banner *scanlib.Response
 }
 
 type IpCache struct {

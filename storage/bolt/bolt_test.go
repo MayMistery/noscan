@@ -3,7 +3,7 @@ package bolt
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/gonmap"
+	"github.com/MayMistery/noscan/scan/scanlib"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/boltdb/bolt"
 	"github.com/stretchr/testify/assert"
@@ -66,7 +66,7 @@ func TestUpdateCache(t *testing.T) {
 			Protocol:   "tcp",
 			ServiceApp: []string{"http"},
 		},
-		Banner: &gonmap.Response{},
+		Banner: &scanlib.Response{},
 	}
 	ipCache := storage.IpCache{
 		Ip:         ip,

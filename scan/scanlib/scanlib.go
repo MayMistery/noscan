@@ -1,4 +1,4 @@
-package gonmap
+package scanlib
 
 import (
 	"log"
@@ -15,7 +15,7 @@ var MatchCount = 0      //指纹数
 var UsedProbesCount = 0 //已使用探针数
 var UsedMatchCount = 0  //已使用指纹数
 
-var logger = Logger(log.New(os.Stderr, "[gonmap] ", log.Ldate|log.Ltime|log.Lshortfile))
+var logger = Logger(log.New(os.Stderr, "[scanlib] ", log.Ldate|log.Ltime|log.Lshortfile))
 
 type Logger interface {
 	Printf(format string, v ...interface{})

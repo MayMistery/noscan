@@ -1,4 +1,4 @@
-package gonmap
+package scanlib
 
 const (
 	Closed     Status = 0x000a1

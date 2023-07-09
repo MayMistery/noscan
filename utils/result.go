@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/gonmap"
+	"github.com/MayMistery/noscan/scan/scanlib"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/MayMistery/noscan/storage/bolt"
 	"log"
@@ -74,7 +74,7 @@ func OutputResultMap() {
 	fmt.Println("JSON file has been created.")
 }
 
-func AddPortInfo(host string, info *cmd.PortInfo, banner *gonmap.Response) {
+func AddPortInfo(host string, info *cmd.PortInfo, banner *scanlib.Response) {
 	if _, ok := PortScanned[host]; !ok {
 		PortScanned[host] = make(map[int]bool)
 	}

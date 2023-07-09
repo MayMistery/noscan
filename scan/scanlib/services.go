@@ -1,4 +1,4 @@
-package gonmap
+package scanlib
 
 import (
 	"strconv"
