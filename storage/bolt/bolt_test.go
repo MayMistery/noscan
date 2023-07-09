@@ -14,7 +14,7 @@ import (
 
 func TestOutputDb(t *testing.T) {
 	cmd.Config.DBFilePath = "../../data/database.db"
-	InitDatabase()
+	//InitDatabase()
 	db, err := bolt.Open(cmd.Config.DBFilePath, 0666, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -41,14 +41,14 @@ func TestOutputDb(t *testing.T) {
 
 func TestUpdateCache(t *testing.T) {
 	// 创建一个临时的测试数据库文件
-	testDBPath := "test.db"
-	defer func() {
-		// 清理测试数据库文件
-		err := cleanupDBFile(testDBPath)
-		if err != nil {
-			t.Errorf("Failed to cleanup test database file: %v", err)
-		}
-	}()
+	testDBPath := "../../data/database.db"
+	//defer func() {
+	//	// 清理测试数据库文件
+	//	err := cleanupDBFile(testDBPath)
+	//	if err != nil {
+	//		t.Errorf("Failed to cleanup test database file: %v", err)
+	//	}
+	//}()
 
 	// 创建存储实例并打开临时数据库文件
 	db, err := NewStorage(testDBPath)
@@ -109,4 +109,9 @@ func cleanupDBFile(filePath string) error {
 		return err
 	}
 	return nil
+}
+
+func TestInitDatabase(t *testing.T) {
+	cmd.Config.DBFilePath = "../../data/database.db"
+	InitDatabase()
 }

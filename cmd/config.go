@@ -33,10 +33,6 @@ type Configs struct {
 	DeepInspection bool
 }
 
-type Command interface {
-	//TODO
-}
-
 var portList = map[string]int{
 	"ftp":     21,
 	"ssh":     22,

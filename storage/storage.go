@@ -11,8 +11,9 @@ type PortInfoStore struct {
 }
 
 type IpCache struct {
-	Ip         string   `storm:"id,increment"`
-	DeviceInfo string   `json:"deviceinfo"`
-	Honeypot   []string `json:"honeypot"`
+	Ip         string `storm:"id,increment"`
+	DeviceInfo string
+	Honeypot   []string
 	Services   []*PortInfoStore
+	Timestamp  string
 }
