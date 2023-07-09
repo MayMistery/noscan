@@ -13,7 +13,7 @@ type Banner struct {
 	ICP      string
 }
 
-func (banner Banner) Search() []string {
+func (banner *Banner) Search() []string {
 	var products []string
 	for _, fingerPrint := range FingerPrints {
 		if isMatch := banner.Match(fingerPrint); isMatch {
@@ -36,8 +36,9 @@ func removeDuplicate(p []string) []string {
 	return result
 }
 
-func (banner Banner) Match(fingerprint *FingerPrint) bool {
-	//TODO 根据Expression去匹配Banner
-
-	return true
+func (banner *Banner) Match(fingerprint *FingerPrint) bool {
+	if fingerprint.Rule != nil {
+		return fingerprint.Rule.match(banner)
+	}
+	return false
 }

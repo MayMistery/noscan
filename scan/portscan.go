@@ -53,6 +53,10 @@ func HandlerMatched(value Address, response *gonmap.Response) {
 		Port:     value.Port,
 		Protocol: protocol,
 	}
-	utils.AddPortInfo(value.IP.String(), portInfo, response)
 	//TODO Further application probing
+	if protocol == "http" || protocol == "https" {
+
+	}
+
+	utils.AddPortInfo(value.IP.String(), portInfo, response)
 }
