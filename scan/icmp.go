@@ -2,7 +2,6 @@ package scan
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/MayMistery/noscan/cmd"
 	"net"
 	"os/exec"
@@ -28,8 +27,9 @@ func CheckLive(host string) bool {
 			return IcmpAlive(host)
 		} else {
 			//Use system ping command
-			fmt.Println("The current user permissions unable to send icmp packets")
-			fmt.Println("start ping")
+			//TODO add it
+			//fmt.Println("The current user permissions unable to send icmp packets")
+			//fmt.Println("start ping")
 			return ExecCommandPing(host)
 		}
 	}
