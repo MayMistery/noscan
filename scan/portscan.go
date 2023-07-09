@@ -25,13 +25,10 @@ func PortScanPool() *utils.Pool {
 		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, 100*cmd.Config.Timeout)
 		switch status {
 		case scanlib.Open:
-		case scanlib.NotMatched:
-		case scanlib.Matched:
-		case gonmap.Open:
 			PortHandlerOpen(value)
-		case gonmap.NotMatched:
+		case scanlib.NotMatched:
 			PortHandlerNotMatched(value, response)
-		case gonmap.Matched:
+		case scanlib.Matched:
 			PortHandlerMatched(value, response)
 		}
 	}
@@ -40,7 +37,7 @@ func PortScanPool() *utils.Pool {
 }
 
 func PortHandlerOpen(value Address) {
-	protocol := gonmap.GuessProtocol(value.Port)
+	protocol := scanlib.GuessProtocol(value.Port)
 	portInfo := &cmd.PortInfo{
 		Port:       value.Port,
 		Protocol:   protocol,
@@ -49,15 +46,15 @@ func PortHandlerOpen(value Address) {
 	utils.AddPortInfo(value.IP.String(), portInfo, nil)
 }
 
-func PortHandlerNotMatched(value Address, response *gonmap.Response) {
+func PortHandlerNotMatched(value Address, response *scanlib.Response) {
 	portInfo := &cmd.PortInfo{
 		Port:     value.Port,
-		Protocol: "c",
+		Protocol: "unknow",
 	}
 	utils.AddPortInfo(value.IP.String(), portInfo, response)
 }
 
-func PortHandlerMatched(value Address, response *gonmap.Response) {
+func PortHandlerMatched(value Address, response *scanlib.Response) {
 	protocol := response.FingerPrint.Service
 	var services []string
 	if product := getProductVersionFromNmap(response); product != "" {
@@ -78,7 +75,7 @@ func PortHandlerMatched(value Address, response *gonmap.Response) {
 	}
 }
 
-func pushURLTarget(URL *url.URL, response *gonmap.Response) {
+func pushURLTarget(URL *url.URL, response *scanlib.Response) {
 	var cli *http.Client
 	//判断是否初始化client
 	if cmd.Config.Proxy != "" || cmd.Config.Timeout != 3*time.Second {
@@ -96,7 +93,7 @@ func pushURLTarget(URL *url.URL, response *gonmap.Response) {
 	HttpScanner.Push(HttpTarget{URL, response, nil, cli})
 }
 
-func getProductVersionFromNmap(response *gonmap.Response) string {
+func getProductVersionFromNmap(response *scanlib.Response) string {
 	var (
 		version string
 		product string

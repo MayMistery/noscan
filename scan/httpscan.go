@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/gonmap"
+	"github.com/MayMistery/noscan/scan/scanlib"
 	"github.com/MayMistery/noscan/utils"
 	"github.com/lcvvvv/appfinger"
 	"net/http"
@@ -14,7 +14,7 @@ import (
 
 type HttpTarget struct {
 	URL      *url.URL
-	response *gonmap.Response
+	response *scanlib.Response
 	req      *http.Request
 	client   *http.Client
 }
