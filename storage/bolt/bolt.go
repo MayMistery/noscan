@@ -22,9 +22,9 @@ func NewStorage(path string) (*Storage, error) {
 	return &Storage{Ipdb: db}, nil
 }
 
-//func (s *Storage) SaveIpCache(ipCache storage.IpCache) error {
-//	return s.Ipdb.Save(&ipCache)
-//}
+func (s *Storage) Close() error {
+	return s.Ipdb.Close()
+}
 
 func (s *Storage) SaveIpCache(ipCache storage.IpCache) error {
 	return s.Ipdb.Save(&ipCache)
