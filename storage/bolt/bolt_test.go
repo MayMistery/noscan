@@ -115,3 +115,26 @@ func TestInitDatabase(t *testing.T) {
 	cmd.Config.DBFilePath = "../../data/database.db"
 	InitDatabase()
 }
+
+func (s *Storage) TestStorage_Async(t *testing.T) {
+	// 用于接收结果的channel
+	saveResultChan := make(chan error, 100)
+	getResultChan := make(chan *storage.IpCache, 100)
+	updateResultChan := make(chan error)
+
+	// Save
+	go s.SaveIpCacheAsync(ipCache, saveResultChan)
+
+	// Get
+	go s.GetIpCacheAsync(ip, getResultChan, errChan)
+
+	// Update
+	go s.UpdateCacheAsync(ipCache, updateResultChan)
+
+	// result
+	//saveError := <-saveResultChan
+	//ipCacheResult := <-getResultChan
+	//getError := <-errChan
+	//updateError := <-updateResultChan
+
+}
