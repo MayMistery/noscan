@@ -12,9 +12,10 @@ func ErrLog(format string, a ...interface{}) {
 	errStr := formattedTime + fmt.Sprintf(format, a...)
 
 	go func() {
+		//TODO change filepath to flag
 		file, err := os.OpenFile("../result/err_log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
-			fmt.Println("Error opening file:", err)
+			fmt.Println("Error opening file:", err, errStr)
 			return
 		}
 		defer file.Close()

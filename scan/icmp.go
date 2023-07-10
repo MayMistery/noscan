@@ -47,13 +47,14 @@ func IcmpAlive(host string) bool {
 			conn.Close()
 		}
 	}()
+	//TODO log timeout or not
 	if err != nil {
 		return false
 	}
 	if err := conn.SetDeadline(startTime.Add(6 * time.Second)); err != nil {
 		return false
 	}
-	msg := makemsg(host)
+	msg := makeMsg(host)
 	if _, err := conn.Write(msg); err != nil {
 		return false
 	}
@@ -88,9 +89,11 @@ func ExecCommandPing(host string) bool {
 	command.Stdout = &outinfo
 	err := command.Start()
 	if err != nil {
+		cmd.ErrLog("Fail to ping by bash %v", err)
 		return false
 	}
 	if err = command.Wait(); err != nil {
+		cmd.ErrLog("Fail to ping by bash (wait) %v", err)
 		return false
 	} else {
 		if strings.Contains(outinfo.String(), "true") {
@@ -101,7 +104,7 @@ func ExecCommandPing(host string) bool {
 	}
 }
 
-func makemsg(host string) []byte {
+func makeMsg(host string) []byte {
 	msg := make([]byte, 40)
 	id0, id1 := genIdentifier(host)
 	msg[0] = 8

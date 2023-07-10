@@ -34,6 +34,7 @@ func HttpScanPool() *cmd.Pool {
 		req := value.req
 		cli := value.client
 		if appfinger.SupportCheck(URL.Scheme) == false {
+			cmd.ErrLog("%s %v", URL.Host, errors.New(NotSupportProtocol))
 			fmt.Println(URL, errors.New(NotSupportProtocol))
 			return
 		}
@@ -64,6 +65,7 @@ func HttpScanPool() *cmd.Pool {
 }
 
 func HttpHandlerError(url *url.URL, err error) {
+	cmd.ErrLog("URLScanner Error: %s %v", url.String(), err)
 	fmt.Println("URLScanner Error: ", url.String(), err)
 }
 

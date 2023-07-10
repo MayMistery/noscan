@@ -53,7 +53,9 @@ func (s *Storage) UpdateCache(ipCache *storage.IpCache) error {
 	}
 	err := s.Ipdb.Update(ipCache)
 
-	cmd.ErrLog("update db fail %v", err)
+	if err != nil {
+		cmd.ErrLog("update db fail %v", err)
+	}
 
 	return err
 }
