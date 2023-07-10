@@ -8,8 +8,11 @@ import (
 	"github.com/MayMistery/noscan/storage"
 	"github.com/MayMistery/noscan/storage/bolt"
 	"os"
+	"sync"
 	"time"
 )
+
+var mu sync.RWMutex
 
 var (
 	Result      = make(map[string]cmd.IpInfo)
@@ -41,7 +44,9 @@ func InitResultMap() {
 		}
 
 		// Add the IpInfo to the Result map
+		mu.Lock()
 		Result[ip.Ip] = ipInfo
+		mu.Unlock()
 
 		// Add the scanned ports to the PortScaned map
 		portScanedMap := make(map[int]bool)
@@ -53,7 +58,10 @@ func InitResultMap() {
 }
 
 func OutputResultMap() {
+	mu.RLock()
 	ipInfos := Result
+	mu.RUnlock()
+
 	filepath := cmd.Config.OutputFilepath
 	file, err := os.Create(filepath)
 	if err != nil {
@@ -82,8 +90,10 @@ func AddPortInfo(host string, info *cmd.PortInfo, banner *scanlib.Response) {
 	if _, ok := PortScanned[host]; !ok {
 		PortScanned[host] = make(map[int]bool)
 	}
-
+	mu.RLock()
 	ipInfo, ok1 := Result[host]
+	mu.RUnlock()
+
 	if ok1 {
 		if _, ok2 := PortScanned[host][info.Port]; ok2 {
 			updatePortInfo(host, info)
@@ -102,62 +112,93 @@ func AddPortInfo(host string, info *cmd.PortInfo, banner *scanlib.Response) {
 	formattedTime := currentTime.Format("2006-01-02 15:04:05")
 	ipInfo.Timestamp = formattedTime
 
+	mu.Lock()
 	Result[host] = ipInfo
+	mu.Unlock()
+	mu.RLock()
+	device := Result[host].DeviceInfo
+	honey := Result[host].Honeypot
+	timeStamp := Result[host].Timestamp
+	mu.RUnlock()
 
+	//TODO unlock or not
 	bolt.UpdateCacheAsync(&storage.IpCache{
 		Ip: host,
 		Services: []*storage.PortInfoStore{{
 			PortInfo: info,
 			Banner:   banner,
 		}},
-		DeviceInfo: Result[host].DeviceInfo,
-		Honeypot:   Result[host].Honeypot,
-		Timestamp:  Result[host].Timestamp,
+		DeviceInfo: device,
+		Honeypot:   honey,
+		Timestamp:  timeStamp,
 	})
 }
 
 func updatePortInfo(host string, info *cmd.PortInfo) {
-	for i := 0; i < len(Result[host].Services); i++ {
-		if Result[host].Services[i].Port == info.Port {
-			info.ServiceApp = RemoveDuplicateStringArr(append(info.ServiceApp, Result[host].Services[i].ServiceApp...))
+	mu.RLock()
+	length := len(Result[host].Services)
+	mu.RUnlock()
+
+	for i := 0; i < length; i++ {
+		mu.RLock()
+		tmp := Result[host].Services[i]
+		mu.RUnlock()
+		if tmp.Port == info.Port {
+			info.ServiceApp = RemoveDuplicateStringArr(append(info.ServiceApp, tmp.ServiceApp...))
+			mu.Lock()
 			Result[host].Services[i] = info
+			mu.Unlock()
 			return
 		}
 	}
 }
 
 func UpdateServiceInfo(host string, port int, serviceInfo []string) {
-	for i := 0; i < len(Result[host].Services); i++ {
-		if Result[host].Services[i].Port == port {
-			Result[host].Services[i].ServiceApp = RemoveDuplicateStringArr(append(Result[host].Services[i].ServiceApp, serviceInfo...))
-			bolt.UpdateServiceInfoAsync(host, port, Result[host].Services[i])
+	mu.RLock()
+	length := len(Result[host].Services)
+	mu.RUnlock()
+	for i := 0; i < length; i++ {
+		mu.RLock()
+		tmp := Result[host].Services[i]
+		mu.RUnlock()
+		if tmp.Port == port {
+			tmp.ServiceApp = RemoveDuplicateStringArr(append(tmp.ServiceApp, serviceInfo...))
+			bolt.UpdateServiceInfoAsync(host, port, tmp)
 			return
 		}
 	}
 }
 
 func UpdateDeviceInfo(host string, deviceInfo string) {
+	mu.RLock()
 	ipInfo, ok1 := Result[host]
+	mu.RUnlock()
 	if ok1 {
 		ipInfo.DeviceInfo = deviceInfo
 	} else {
 		ipInfo = cmd.IpInfo{}
 		ipInfo.DeviceInfo = deviceInfo
 	}
+	mu.Lock()
 	Result[host] = ipInfo
+	mu.Unlock()
 
 	bolt.UpdateDeviceInfoAsync(host, deviceInfo)
 }
 
 func UpdateHoneypot(host string, honeypot []string) {
+	mu.RLock()
 	ipInfo, ok1 := Result[host]
+	mu.RUnlock()
 	if ok1 {
 		ipInfo.Honeypot = RemoveDuplicateStringArr(append(ipInfo.Honeypot, honeypot...))
 	} else {
 		ipInfo = cmd.IpInfo{}
 		ipInfo.Honeypot = honeypot
 	}
+	mu.Lock()
 	Result[host] = ipInfo
+	mu.Unlock()
 
 	bolt.UpdateHoneypotAsync(host, ipInfo.Honeypot)
 }
