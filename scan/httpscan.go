@@ -25,8 +25,8 @@ const (
 	NotSupportProtocol = "protocol is not support"
 )
 
-func HttpScanPool() *utils.Pool {
-	httpScanPool := utils.NewPool(cmd.Config.Threads)
+func HttpScanPool() *cmd.Pool {
+	httpScanPool := cmd.NewPool(cmd.Config.Threads)
 	httpScanPool.Function = func(in interface{}) {
 		value := in.(HttpTarget)
 		URL := value.URL

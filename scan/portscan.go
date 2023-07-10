@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-func PortScanPool() *utils.Pool {
-	portScanPool := utils.NewPool(cmd.Config.Threads)
+func PortScanPool() *cmd.Pool {
+	portScanPool := cmd.NewPool(cmd.Config.Threads)
 	portScanPool.Function = func(in interface{}) {
 		nmap := scanlib.New()
 		nmap.SetTimeout(cmd.Config.Timeout)

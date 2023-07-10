@@ -3,7 +3,6 @@ package scan
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/utils"
 	"net"
 )
 
@@ -13,9 +12,9 @@ type Address struct {
 }
 
 var (
-	Scanner     *utils.Pool
-	PortScanner *utils.Pool
-	HttpScanner *utils.Pool
+	Scanner     *cmd.Pool
+	PortScanner *cmd.Pool
+	HttpScanner *cmd.Pool
 )
 
 func InitTarget(cfg cmd.Configs) error {
@@ -45,7 +44,7 @@ func InitTarget(cfg cmd.Configs) error {
 }
 
 func InitScanner() {
-	Scanner = ScanPool()
+	Scanner = ScannerPool()
 	PortScanner = PortScanPool()
 	HttpScanner = HttpScanPool()
 
@@ -68,8 +67,8 @@ func Scan() error {
 	return nil
 }
 
-func ScanPool() *utils.Pool {
-	scanPool := utils.NewPool(cmd.Config.Threads/4 + 1)
+func ScannerPool() *cmd.Pool {
+	scanPool := cmd.NewPool(cmd.Config.Threads/4 + 1)
 	scanPool.Function = func(input interface{}) {
 		host := input.(string)
 		if CheckLive(host) {

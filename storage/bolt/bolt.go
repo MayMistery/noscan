@@ -3,14 +3,13 @@ package bolt
 import (
 	"github.com/MayMistery/noscan/cmd"
 	"github.com/MayMistery/noscan/storage"
-	"github.com/MayMistery/noscan/utils"
 	"github.com/asdine/storm/v3"
 	"log"
 )
 
 var (
 	DB     *Storage
-	DBPool *utils.Pool
+	DBPool *cmd.Pool
 )
 
 type Storage struct {
@@ -173,8 +172,8 @@ type honeypotInput struct {
 	honeypot []string
 }
 
-func NewDBPool() *utils.Pool {
-	dbPool := utils.NewPool(cmd.Config.Threads/10 + 1)
+func NewDBPool() *cmd.Pool {
+	dbPool := cmd.NewPool(cmd.Config.Threads/10 + 1)
 	dbPool.Function = func(input interface{}) {
 		in := input.(poolInput)
 		var err error
