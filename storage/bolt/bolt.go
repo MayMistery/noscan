@@ -31,13 +31,16 @@ func (s *Storage) Close() error {
 }
 
 func (s *Storage) SaveIpCache(ipCache *storage.IpCache) error {
-	return s.Ipdb.Save(ipCache)
+	err := s.Ipdb.Save(ipCache)
+	cmd.ErrLog("save ip to db fail %v", err)
+	return err
 }
 
 func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 	var ipCache storage.IpCache
 	err := s.Ipdb.One("Ip", ip, &ipCache)
 	if err != nil {
+		cmd.ErrLog("Get ip from db fail %v", err)
 		return nil, err
 	}
 
@@ -48,9 +51,11 @@ func (s *Storage) UpdateCache(ipCache *storage.IpCache) error {
 	if _, err := s.GetIpCache(ipCache.Ip); err != nil {
 		return s.SaveIpCache(ipCache)
 	}
-	return s.Ipdb.Update(ipCache)
+	err := s.Ipdb.Update(ipCache)
 
-	//TODO further check
+	cmd.ErrLog("update db fail %v", err)
+
+	return err
 }
 
 func UpdateCacheAsync(ipCache *storage.IpCache) {
@@ -139,6 +144,7 @@ func InitDatabase() {
 	DBPool = NewDBPool()
 	go DBPool.Run()
 	if err != nil {
+		cmd.ErrLog("fail to InitDatabase %v", err)
 		log.Fatal(err)
 	}
 }
@@ -147,7 +153,8 @@ func CloseDatabase() {
 	defer func(db *Storage) {
 		err := db.Close()
 		if err != nil {
-			//TODO add errorLog
+			cmd.ErrLog("fail to CloseDatabase %v", err)
+			panic(err)
 		}
 	}(DB)
 }
@@ -199,13 +206,16 @@ func NewDBPool() *cmd.Pool {
 		}
 
 		if err != nil {
-			HandleDBError(err)
+			cmd.ErrLog("dbAction unmatched %v", err)
+			//HandleDBError(err)
 			return
 		}
 	}
 	return dbPool
 }
 
-func HandleDBError(err error) {
-	//TODO handle db error
-}
+//func HandleDBError(err error) {
+//
+//
+//	//TODO handle db error
+//}

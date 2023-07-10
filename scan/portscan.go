@@ -83,7 +83,11 @@ func pushURLTarget(URL *url.URL, response *scanlib.Response) {
 	}
 	//判断是否需要设置代理
 	if cmd.Config.Proxy != "" {
-		simplehttp.SetProxy(cli, cmd.Config.Proxy)
+		err := simplehttp.SetProxy(cli, cmd.Config.Proxy)
+		if err != nil {
+			cmd.ErrLog("SetProxy error %v", err)
+			return
+		}
 	}
 	//判断是否需要设置超时参数
 	if cmd.Config.Timeout != 3*time.Second {

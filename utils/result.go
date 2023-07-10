@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/MayMistery/noscan/cmd"
 	"github.com/MayMistery/noscan/scan/scanlib"
 	"github.com/MayMistery/noscan/storage"
@@ -20,7 +21,7 @@ func InitResultMap() {
 	var ips []storage.IpCache
 	err := bolt.DB.Ipdb.All(&ips)
 	if err != nil {
-		cmd.ErrLog("Failed to retrieve data from the database: %v\n", err)
+		cmd.ErrLog("Failed to retrieve data from the database: %v", err)
 		return
 	}
 	//fmt.Println(ips)
@@ -56,20 +57,25 @@ func OutputResultMap() {
 	filepath := cmd.Config.OutputFilepath
 	file, err := os.Create(filepath)
 	if err != nil {
-		cmd.ErrLog("Failed to create file:", err)
+		cmd.ErrLog("Failed to create file: %v", err)
 		return
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			cmd.ErrLog("Failed to close file: %v", err)
+		}
+	}(file)
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	err = encoder.Encode(ipInfos)
 	if err != nil {
-		cmd.ErrLog("Failed to encode JSON:", err)
+		cmd.ErrLog("Failed to encode JSON: %v", err)
 		return
 	}
 
-	cmd.ErrLog("JSON file has been created.")
+	fmt.Println("JSON file has been created.")
 }
 
 func AddPortInfo(host string, info *cmd.PortInfo, banner *scanlib.Response) {

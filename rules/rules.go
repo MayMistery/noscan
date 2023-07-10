@@ -3,6 +3,7 @@ package rules
 import (
 	"errors"
 	"fmt"
+	"github.com/MayMistery/noscan/cmd"
 	"io"
 	"os"
 	"reflect"
@@ -34,15 +35,13 @@ var FingerPrints []*FingerPrint
 func addFingerPrint(productName string, ruleExpr string) error {
 	expression, err := parseExpression(ruleExpr)
 	if err != nil {
+		cmd.ErrLog("Parse expression error %s %s", productName, ruleExpr)
 		return err
 	}
 
 	httpFinger := &FingerPrint{
 		ProductName: productName,
 		Rule:        expression,
-	}
-	if err != nil {
-		return err
 	}
 	FingerPrints = append(FingerPrints, httpFinger)
 	return nil
@@ -51,6 +50,7 @@ func addFingerPrint(productName string, ruleExpr string) error {
 func InitFingerPrints(path string) (n int, lastErr error) {
 	fs, err := os.Open(path)
 	if err != nil {
+		cmd.ErrLog("Open fingerprints error %s %v", path, err)
 		return 0, err
 	}
 	return InitFingerPrintsFS(fs)
@@ -59,6 +59,7 @@ func InitFingerPrints(path string) (n int, lastErr error) {
 func InitFingerPrintsFS(fs io.Reader) (n int, lastErr error) {
 	sourceBuf, err := io.ReadAll(fs)
 	if err != nil {
+		cmd.ErrLog("Open fingerprintsFs error %v", err)
 		return 0, err
 	}
 	source := strings.Split(string(sourceBuf), "\n")
@@ -71,6 +72,7 @@ func InitFingerPrintsFS(fs io.Reader) (n int, lastErr error) {
 		}
 		err := addFingerPrint(r[0], r[1])
 		if err != nil {
+			cmd.ErrLog("add fingerprintsFs error %v", err)
 			lastErr = err
 		}
 	}
@@ -90,6 +92,7 @@ func parseExpression(expr string) (*Expression, error) {
 	expr = strings.ReplaceAll(expr, `\"`, `[quota]`)
 	//字符合法性校验
 	if err := exprCharVerification(expr); err != nil {
+		cmd.ErrLog("exprCharVerification error %v", err)
 		return nil, err
 	}
 	//提取param数组
@@ -100,12 +103,14 @@ func parseExpression(expr string) (*Expression, error) {
 		expr = strings.Replace(expr, value[0], "${"+strconv.Itoa(index+1)+"}", 1)
 		param, err := parseParam(value[0])
 		if err != nil {
+			cmd.ErrLog("parseParam error %v", err)
 			return nil, err
 		}
 		paramSlice = append(paramSlice, param)
 	}
 	//语义合法性校验
 	if err := exprSyntaxVerification(expr); err != nil {
+		cmd.ErrLog("exprSyntaxVerification error %v", err)
 		return nil, err
 	}
 	e.expr = expr
@@ -215,11 +220,13 @@ func parseParam(expr string) (*Param, error) {
 	valueRaw = strings.ReplaceAll(valueRaw, `[quota]`, `\"`)
 	value, err := strconv.Unquote("\"" + valueRaw + "\"")
 	if err != nil {
+		cmd.ErrLog("parseParam strconv.Unquote error")
 		return nil, err
 	}
 	if operator == regxEqual {
 		_, err = regexp.Compile(value)
 		if err != nil {
+			cmd.ErrLog("parseParam regexp.Compile error")
 			return nil, err
 		}
 	}
@@ -282,7 +289,7 @@ func parseBoolFromString(expr string) (bool, error) {
 	//如果存在其他异常字符，则报错
 	s := regexp.MustCompile(`true|false|&|\||\(|\)`).ReplaceAllString(expr, "")
 	if s != "" {
-		return false, errors.New(s + "is known")
+		return false, errors.New(s + "is unknown")
 	}
 	return stringParse(expr)
 }
@@ -319,10 +326,12 @@ func stringParse(expr string) (bool, error) {
 		if char == "(" {
 			length, err := findCoupleBracketIndex(expr[i:])
 			if err != nil {
+				cmd.ErrLog("findCoupleBracketIndex error")
 				return false, err
 			}
 			next, err := stringParse(expr[i+1 : i+length])
 			if err != nil {
+				cmd.ErrLog("stringParse error")
 				return false, err
 			}
 			first = parseCoupleBool(first, next, operator)
@@ -398,7 +407,9 @@ func splitExpression(s string) []string {
 		if char == "(" {
 			length, err := findCoupleBracketIndex(s[i:])
 			if err != nil {
+				cmd.ErrLog("PANIC!!! findCoupleBracketIndex %v", err)
 				panic(err)
+				//TODO why panic
 			}
 			data = append(data, s[i+1:i+length])
 			i += length
@@ -433,6 +444,8 @@ func splitExpression(s string) []string {
 		}
 		if s == "&&" {
 			if len(r) == 0 {
+				cmd.ErrLog("PANIC!!! expression invalid")
+				//TODO why panic
 				panic("expression invalid")
 			}
 			for j := 1; j < len(r); j++ {

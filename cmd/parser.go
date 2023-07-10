@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"math/big"
 	"net"
 	"os"
@@ -18,11 +19,17 @@ func ReadIPAddressesFromFile(config Configs) ([]string, error) {
 	filepath := config.InputFilepath
 	file, err := os.Open(filepath)
 	if err != nil {
+		log.Printf("Fail to open the target file %v", err)
+		ErrLog("Fail to open the target file %v", err)
 		return nil, err
 	}
 
 	defer func(file *os.File) {
-		_ = file.Close()
+		err := file.Close()
+		if err != nil {
+			log.Printf("Fail to close the target file %v", err)
+			ErrLog("Fail to close the target file %v", err)
+		}
 	}(file)
 
 	scanner := bufio.NewScanner(file)
@@ -35,6 +42,8 @@ func ReadIPAddressesFromFile(config Configs) ([]string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
+		log.Printf("Fail to read the target file %v", err)
+		ErrLog("Fail to read the target file %v", err)
 		return nil, err
 	}
 
@@ -65,9 +74,13 @@ func InTarget(ip string) bool {
 
 func GetPools(ipPoolFuncList []func() string) func() string {
 	return func() string {
+
 		for _, ipPoolFunc := range ipPoolFuncList {
-			//TODO maybe have bug, but look well
-			for ip := ipPoolFunc(); ip != ""; ip = ipPoolFunc() {
+			//for ip := ipPoolFunc(); ip != ""; ip = ipPoolFunc() {
+			//	return ip
+			//}
+			ip := ipPoolFunc()
+			if ip != "" {
 				return ip
 			}
 		}
@@ -162,7 +175,7 @@ func ParsePort() (scanPorts []int) {
 }
 
 func removeDuplicate(old []int) []int {
-	result := []int{}
+	var result []int
 	temp := map[int]struct{}{}
 	for _, item := range old {
 		if _, ok := temp[item]; !ok {

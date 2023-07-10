@@ -20,6 +20,7 @@ var (
 func InitTarget(cfg cmd.Configs) error {
 	cidrIPs, err := cmd.ReadIPAddressesFromFile(cfg)
 	if err != nil {
+		cmd.ErrLog("Read target ip fail %v", err)
 		fmt.Println("[-]Read target ip fail")
 		return err
 	}
@@ -29,6 +30,7 @@ func InitTarget(cfg cmd.Configs) error {
 	for _, cidrIp := range cidrIPs {
 		err := ipPool.SetPool(cidrIp)
 		if err != nil {
+			cmd.ErrLog("SetPool fail %v", err)
 			return err
 		}
 		cmd.IPPoolsSize += ipPool.GetPoolSize()
@@ -57,6 +59,7 @@ func Scan() error {
 	err := InitTarget(cmd.Config)
 	InitScanner()
 	if err != nil {
+		cmd.ErrLog("InitTarget error %v", err)
 		return err
 	}
 

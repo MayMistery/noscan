@@ -20,7 +20,11 @@ func CheckLive(host string) bool {
 		conn, err := net.DialTimeout("ip4:icmp", "127.0.0.1", 3*time.Second)
 		defer func() {
 			if conn != nil {
-				conn.Close()
+				err := conn.Close()
+				if err != nil {
+					cmd.ErrLog("connect close error %v", err)
+					return
+				}
 			}
 		}()
 		if err == nil {
