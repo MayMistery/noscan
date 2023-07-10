@@ -19,6 +19,7 @@ type Storage struct {
 func NewStorage(path string) (*Storage, error) {
 	db, err := storm.Open(path)
 	if err != nil {
+		cmd.ErrLog("Open db fail %v", err)
 		return nil, err
 	}
 

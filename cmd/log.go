@@ -1,12 +1,15 @@
-package utils
+package cmd
 
 import (
 	"fmt"
 	"os"
+	"time"
 )
 
-func errLog(format string, a ...interface{}) {
-	errStr := fmt.Sprintf(format, a...)
+func ErrLog(format string, a ...interface{}) {
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("2006-01-02 15:04:05") + " : "
+	errStr := formattedTime + fmt.Sprintf(format, a...)
 
 	go func() {
 		file, err := os.OpenFile("../result/err_log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
