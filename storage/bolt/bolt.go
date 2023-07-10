@@ -5,6 +5,7 @@ import (
 	"github.com/MayMistery/noscan/storage"
 	"github.com/asdine/storm/v3"
 	"log"
+	"sync"
 )
 
 var (
@@ -139,20 +140,24 @@ func UpdateHoneypotAsync(host string, honeypot []string) {
 	})
 }
 
-func InitDatabase() {
+func InitAsyncDatabase() *sync.WaitGroup {
 	// 创建一个新的存储实例
 	var err error
+	wg := &sync.WaitGroup{}
 	DB, err = NewStorage(cmd.Config.DBFilePath)
 	DBPool = NewDBPool()
+	wg.Add(1)
 	go DBPool.Run()
 	if err != nil {
-		cmd.ErrLog("fail to InitDatabase %v", err)
+		cmd.ErrLog("fail to InitAsyncDatabase %v", err)
 		log.Fatal(err)
 	}
+	return wg
 }
 
-func CloseDatabase() {
+func CloseDatabase(wg *sync.WaitGroup) {
 	defer func(db *Storage) {
+		wg.Done()
 		err := db.Close()
 		if err != nil {
 			cmd.ErrLog("fail to CloseDatabase %v", err)

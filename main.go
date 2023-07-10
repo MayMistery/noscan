@@ -37,7 +37,7 @@ func main() {
 func Exec() {
 
 	cmd.Flag(&cmd.Config)
-	bolt.InitDatabase()
+	dbWaitGroup := bolt.InitAsyncDatabase()
 	utils.InitResultMap()
 
 	fs, _ := os.Open(cmd.Config.RulesFilePath)
@@ -58,6 +58,7 @@ func Exec() {
 	}
 
 	defer func() {
-		bolt.CloseDatabase()
+		bolt.CloseDatabase(dbWaitGroup)
+		dbWaitGroup.Wait()
 	}()
 }

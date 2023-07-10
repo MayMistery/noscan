@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
 	"net"
+	"sync"
+	"time"
 )
 
 type Address struct {
@@ -45,19 +47,41 @@ func InitTarget(cfg cmd.Configs) error {
 	return nil
 }
 
-func InitScanner() {
+func InitScanner() *sync.WaitGroup {
+	wg := &sync.WaitGroup{}
+
 	Scanner = ScannerPool()
 	PortScanner = PortScanPool()
 	HttpScanner = HttpScanPool()
 
+	wg.Add(3)
 	go Scanner.Run()
 	go PortScanner.Run()
 	go HttpScanner.Run()
+	return wg
+}
+
+func StopScanner(wg *sync.WaitGroup) {
+	for {
+		time.Sleep(time.Second * 3)
+		if Scanner.RunningThreads() == 0 && Scanner.Done == false {
+			Scanner.Stop()
+			wg.Done()
+		}
+		if PortScanner.RunningThreads() == 0 && PortScanner.Done == false {
+			PortScanner.Stop()
+			wg.Done()
+		}
+		if HttpScanner.RunningThreads() == 0 && HttpScanner.Done == false {
+			HttpScanner.Stop()
+			wg.Done()
+		}
+	}
 }
 
 func Scan() error {
 	err := InitTarget(cmd.Config)
-	InitScanner()
+	wg := InitScanner()
 	if err != nil {
 		cmd.ErrLog("InitTarget error %v", err)
 		return err
@@ -67,6 +91,8 @@ func Scan() error {
 		Scanner.Push(host)
 	}
 
+	go StopScanner(wg)
+	wg.Wait()
 	return nil
 }
 

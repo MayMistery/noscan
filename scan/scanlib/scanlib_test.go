@@ -8,8 +8,12 @@ import (
 
 func TestScan(t *testing.T) {
 	var scanner = New()
-	host := "45.126.125.13"
-	port := 80
+	host := "204.168.173.224"
+	port := 111
+	scanner.OpenDeepIdentify()
 	status, response := scanner.ScanTimeout(host, port, time.Second*30)
-	fmt.Println(status, response.FingerPrint.Service, host, ":", port)
+	if response != nil {
+		fmt.Println(status, response.FingerPrint.Service, host, ":", port, response.FingerPrint.ProductName)
+	}
+	//time.Sleep(100000)
 }

@@ -21,7 +21,7 @@ func TestName(t *testing.T) {
 
 func TestInitResultMap(t *testing.T) {
 	cmd.Config.DBFilePath = "../data/database.db"
-	bolt.InitDatabase()
+	bolt.InitAsyncDatabase()
 	cmd.Config.OutputFilepath = "../result/result.json"
 	InitResultMap()
 	OutputResultMap()

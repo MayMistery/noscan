@@ -15,7 +15,7 @@ import (
 
 func TestOutputDb(t *testing.T) {
 	cmd.Config.DBFilePath = "../../data/database.db"
-	//InitDatabase()
+	//InitAsyncDatabase()
 	db, err := bolt.Open(cmd.Config.DBFilePath, 0666, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -114,7 +114,7 @@ func cleanupDBFile(filePath string) error {
 
 func TestInitDatabase(t *testing.T) {
 	cmd.Config.DBFilePath = "../../data/database.db"
-	InitDatabase()
+	InitAsyncDatabase()
 }
 
 func (s *Storage) TestStorage_Async(t *testing.T) {
@@ -154,7 +154,7 @@ func TestHighConcurrency(t *testing.T) {
 	//db, err := NewStorage(testDBPath)
 	cmd.Config.Threads = 50000
 	cmd.Config.DBFilePath = "../../data/database.db"
-	InitDatabase()
+	InitAsyncDatabase()
 	ip := "127.0.0.2"
 	portInfoStore := &storage.PortInfoStore{
 		PortInfo: &cmd.PortInfo{

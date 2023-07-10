@@ -25,12 +25,12 @@ var matchLoadRegexps = []*regexp.Regexp{
 }
 
 var matchVersionInfoRegexps = map[string]*regexp.Regexp{
-	"PRODUCTNAME": regexp.MustCompile("p/([^/]+)/"),
-	"VERSION":     regexp.MustCompile("v/([^/]+)/"),
-	"INFO":        regexp.MustCompile("i/([^/]+)/"),
-	"HOSTNAME":    regexp.MustCompile("h/([^/]+)/"),
-	"OS":          regexp.MustCompile("o/([^/]+)/"),
-	"DEVICE":      regexp.MustCompile("d/([^/]+)/"),
+	"PRODUCTNAME": regexp.MustCompile(" p/([^/]+)/"),
+	"VERSION":     regexp.MustCompile(" v/([^/]+)/"),
+	"INFO":        regexp.MustCompile(" i/([^/]+)/"),
+	"HOSTNAME":    regexp.MustCompile(" h/([^/]+)/"),
+	"OS":          regexp.MustCompile(" o/([^/]+)/"),
+	"DEVICE":      regexp.MustCompile(" d/([^/]+)/"),
 }
 
 var matchVersionInfoHelperRegxP = regexp.MustCompile(`\$P\((\d)\)`)
