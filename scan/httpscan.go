@@ -107,7 +107,8 @@ var deviceMappings = []deviceMapping{
 
 func HandleAppFingerprint(url *url.URL, inputFinger []string) {
 	//遍历ProductName []string
-	var device, honeyPot, service []string
+	var honeyPot, service []string
+	var deviceInfo string
 	for i := 0; i < len(inputFinger); i++ {
 		//strip /t
 		inputFinger[i] = strings.TrimRight(inputFinger[i], "\t")
@@ -138,16 +139,13 @@ func HandleAppFingerprint(url *url.URL, inputFinger []string) {
 			service = append(service, inputFinger[i])
 		} else {
 			//TODO strip device name
-			deviceInfo := matchedDevice + "/" + inputFinger[i]
-			device = append(device, deviceInfo)
+			deviceInfo = matchedDevice + "/" + inputFinger[i]
+			//device = append(device, deviceInfo)
 		}
 	}
 
 	port, _ := strconv.Atoi(url.Port())
 	utils.UpdateServiceInfo(url.Hostname(), port, service)
-
-	//TODO updateIpInfo
-	//utils.UpdateIpInfo(URL.Hostname(), honeyPot)
-	//utils.UpdateDevice
-	//utils.UpdateHoneypot
+	utils.UpdateDeviceInfo(url.Hostname(), deviceInfo)
+	utils.UpdateHoneypot(url.Hostname(), honeyPot)
 }

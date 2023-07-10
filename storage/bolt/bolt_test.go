@@ -76,7 +76,7 @@ func TestUpdateCache(t *testing.T) {
 	}
 
 	// 保存测试数据到数据库
-	err = db.SaveIpCache(ipCache)
+	err = db.SaveIpCache(&ipCache)
 	if err != nil {
 		t.Errorf("Failed to save test data: %v", err)
 		return
@@ -86,7 +86,7 @@ func TestUpdateCache(t *testing.T) {
 	ipCache.DeviceInfo = "Updated Device"
 
 	// 更新缓存
-	err = db.UpdateCache(ipCache)
+	err = db.UpdateCache(&ipCache)
 	if err != nil {
 		t.Errorf("Failed to update cache: %v", err)
 		return
@@ -118,18 +118,18 @@ func TestInitDatabase(t *testing.T) {
 
 func (s *Storage) TestStorage_Async(t *testing.T) {
 	// 用于接收结果的channel
-	saveResultChan := make(chan error, 100)
-	getResultChan := make(chan *storage.IpCache, 100)
-	updateResultChan := make(chan error)
-
-	// Save
-	go s.SaveIpCacheAsync(ipCache, saveResultChan)
-
-	// Get
-	go s.GetIpCacheAsync(ip, getResultChan, errChan)
-
-	// Update
-	go s.UpdateCacheAsync(ipCache, updateResultChan)
+	//saveResultChan := make(chan error, 100)
+	//getResultChan := make(chan *storage.IpCache, 100)
+	//updateResultChan := make(chan error)
+	//
+	//// Save
+	//go s.SaveIpCacheAsync(ipCache, saveResultChan)
+	//
+	//// Get
+	//go s.GetIpCacheAsync(ip, getResultChan, errChan)
+	//
+	//// Update
+	//go s.UpdateCacheAsync(ipCache, updateResultChan)
 
 	// result
 	//saveError := <-saveResultChan

@@ -100,7 +100,7 @@ func AddPortInfo(host string, info *cmd.PortInfo, banner *scanlib.Response) {
 
 	Result[host] = ipInfo
 
-	bolt.DB.UpdateCache(storage.IpCache{
+	bolt.UpdateCacheAsync(&storage.IpCache{
 		Ip: host,
 		Services: []*storage.PortInfoStore{{
 			PortInfo: info,
@@ -126,8 +126,34 @@ func UpdateServiceInfo(host string, port int, serviceInfo []string) {
 	for i := 0; i < len(Result[host].Services); i++ {
 		if Result[host].Services[i].Port == port {
 			Result[host].Services[i].ServiceApp = RemoveDuplicateStringArr(append(Result[host].Services[i].ServiceApp, serviceInfo...))
-			bolt.DB.UpdateServiceInfo(host, port, Result[host].Services[i])
+			bolt.UpdateServiceInfoAsync(host, port, Result[host].Services[i])
 			return
 		}
 	}
+}
+
+func UpdateDeviceInfo(host string, deviceInfo string) {
+	ipInfo, ok1 := Result[host]
+	if ok1 {
+		ipInfo.DeviceInfo = deviceInfo
+	} else {
+		ipInfo = cmd.IpInfo{}
+		ipInfo.DeviceInfo = deviceInfo
+	}
+	Result[host] = ipInfo
+
+	bolt.UpdateDeviceInfoAsync(host, deviceInfo)
+}
+
+func UpdateHoneypot(host string, honeypot []string) {
+	ipInfo, ok1 := Result[host]
+	if ok1 {
+		ipInfo.Honeypot = RemoveDuplicateStringArr(append(ipInfo.Honeypot, honeypot...))
+	} else {
+		ipInfo = cmd.IpInfo{}
+		ipInfo.Honeypot = honeypot
+	}
+	Result[host] = ipInfo
+
+	bolt.UpdateHoneypotAsync(host, ipInfo.Honeypot)
 }
