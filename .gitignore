@@ -30,3 +30,4 @@ database.db
 go.work
 
 noscan
+/utils/log_test.go

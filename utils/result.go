@@ -7,7 +7,6 @@ import (
 	"github.com/MayMistery/noscan/scan/scanlib"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/MayMistery/noscan/storage/bolt"
-	"log"
 	"os"
 	"time"
 )
@@ -22,7 +21,7 @@ func InitResultMap() {
 	var ips []storage.IpCache
 	err := bolt.DB.Ipdb.All(&ips)
 	if err != nil {
-		log.Printf("Failed to retrieve data from the database: %v\n", err)
+		errLog("Failed to retrieve data from the database: %v\n", err)
 		return
 	}
 	//fmt.Println(ips)
