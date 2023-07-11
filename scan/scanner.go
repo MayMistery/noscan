@@ -97,7 +97,7 @@ func Scan() error {
 }
 
 func ScannerPool() *cmd.Pool {
-	scanPool := cmd.NewPool(cmd.Config.Threads/100 + 1)
+	scanPool := cmd.NewPool(cmd.Config.Threads/20 + 1)
 	scanPool.Function = func(input interface{}) {
 		host := input.(string)
 		if CheckLive(host) {

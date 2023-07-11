@@ -43,7 +43,7 @@ func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 	var ipCache storage.IpCache
 	err := s.Ipdb.One("Ip", ip, &ipCache)
 	if err != nil {
-		cmd.ErrLog("Get ip from db fail %v", err)
+		//cmd.ErrLog("Get ip from db fail %v", err)
 		return nil, err
 	}
 
