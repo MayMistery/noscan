@@ -15,6 +15,7 @@ var (
 
 type Storage struct {
 	Ipdb *storm.DB
+	mu   sync.RWMutex
 }
 
 func NewStorage(path string) (*Storage, error) {
@@ -32,6 +33,9 @@ func (s *Storage) Close() error {
 }
 
 func (s *Storage) SaveIpCache(ipCache *storage.IpCache) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	err := s.Ipdb.Save(ipCache)
 	if err != nil {
 		cmd.ErrLog("save ip to db fail %v", err)
@@ -40,6 +44,9 @@ func (s *Storage) SaveIpCache(ipCache *storage.IpCache) error {
 }
 
 func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	var ipCache storage.IpCache
 	err := s.Ipdb.One("Ip", ip, &ipCache)
 	if err != nil {
@@ -51,6 +58,9 @@ func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 }
 
 func (s *Storage) UpdateCache(ipCache *storage.IpCache) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if _, err := s.GetIpCache(ipCache.Ip); err != nil {
 		return s.SaveIpCache(ipCache)
 	}

@@ -12,6 +12,7 @@ import (
 )
 
 var mu sync.RWMutex
+var icu sync.RWMutex
 
 var (
 	Result      = make(map[string]cmd.IpInfo)
@@ -50,7 +51,9 @@ func InitResultMap() {
 		for _, portInfoStore := range ip.Services {
 			portScanedMap[portInfoStore.Port] = true
 		}
+		icu.Lock()
 		PortScanned[ip.Ip] = portScanedMap
+		icu.Unlock()
 	}
 }
 
@@ -84,24 +87,37 @@ func OutputResultMap() {
 }
 
 func AddPortInfo(host string, info *cmd.PortInfo) {
-	if _, ok := PortScanned[host]; !ok {
+	icu.RLock()
+	_, ok := PortScanned[host]
+	icu.RUnlock()
+	if !ok {
+		icu.Lock()
 		PortScanned[host] = make(map[int]bool)
+		icu.Unlock()
 	}
 	mu.RLock()
 	ipInfo, ok1 := Result[host]
 	mu.RUnlock()
 
 	if ok1 {
-		if _, ok2 := PortScanned[host][info.Port]; ok2 {
+		icu.RLock()
+		_, ok2 := PortScanned[host][info.Port]
+		icu.RUnlock()
+
+		if ok2 {
 			updatePortInfo(host, info)
 		} else {
 			ipInfo.Services = append(ipInfo.Services, info)
+			icu.Lock()
 			PortScanned[host][info.Port] = true
+			icu.Unlock()
 		}
 	} else {
 		ipInfo = cmd.IpInfo{}
 		ipInfo.Services = []*cmd.PortInfo{info}
+		icu.Lock()
 		PortScanned[host][info.Port] = true
+		icu.Unlock()
 	}
 
 	//add timestamp
