@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/scanlib"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/MayMistery/noscan/storage/bolt"
 	"os"
@@ -39,9 +38,7 @@ func InitResultMap() {
 		}
 
 		// Populate the Services field of IpInfo
-		for i, portInfoStore := range ip.Services {
-			ipInfo.Services[i] = portInfoStore.PortInfo
-		}
+		ipInfo.Services = ip.Services
 
 		// Add the IpInfo to the Result map
 		mu.Lock()
@@ -86,7 +83,7 @@ func OutputResultMap() {
 	fmt.Println("JSON file has been created.")
 }
 
-func AddPortInfo(host string, info *cmd.PortInfo, banner *scanlib.Response) {
+func AddPortInfo(host string, info *cmd.PortInfo) {
 	if _, ok := PortScanned[host]; !ok {
 		PortScanned[host] = make(map[int]bool)
 	}
@@ -123,11 +120,8 @@ func AddPortInfo(host string, info *cmd.PortInfo, banner *scanlib.Response) {
 
 	//TODO unlock or not
 	bolt.UpdateCacheAsync(&storage.IpCache{
-		Ip: host,
-		Services: []*storage.PortInfoStore{{
-			PortInfo: info,
-			Banner:   banner,
-		}},
+		Ip:         host,
+		Services:   ipInfo.Services,
 		DeviceInfo: device,
 		Honeypot:   honey,
 		Timestamp:  timeStamp,

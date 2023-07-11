@@ -33,7 +33,9 @@ func (s *Storage) Close() error {
 
 func (s *Storage) SaveIpCache(ipCache *storage.IpCache) error {
 	err := s.Ipdb.Save(ipCache)
-	cmd.ErrLog("save ip to db fail %v", err)
+	if err != nil {
+		cmd.ErrLog("save ip to db fail %v", err)
+	}
 	return err
 }
 
@@ -79,10 +81,7 @@ func (s *Storage) UpdateServiceInfo(serviceInfoArg *serviceInfoInput) error {
 
 	for i := 0; i < len(ipCache.Services); i++ {
 		if ipCache.Services[i].Port == port {
-			ipCache.Services[i] = &storage.PortInfoStore{
-				PortInfo: services,
-				Banner:   ipCache.Services[i].Banner,
-			}
+			ipCache.Services[i] = services
 			break
 		}
 	}

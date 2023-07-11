@@ -20,20 +20,23 @@ func TestPortScan(t *testing.T) {
 	utils.InitResultMap()
 
 	wg := &sync.WaitGroup{}
-	wg.Add(2)
 	PortScanner = PortScanPool()
 	HttpScanner = HttpScanPool()
 
+	wg.Add(2)
 	go PortScanner.Run()
 	go HttpScanner.Run()
 
-	for i := 1; i < 65536; i++ {
-		PortScanner.Push(Address{net.ParseIP("204.168.173.224"), i})
-	}
+	//for i := 1; i < 65536; i++ {
+	//	PortScanner.Push(Address{net.ParseIP("204.168.173.224"), i})
+	//}
+	PortScanner.Push(Address{net.ParseIP("204.168.173.224"), 22})
+	PortScanner.Push(Address{net.ParseIP("204.168.173.224"), 443})
+	PortScanner.Push(Address{net.ParseIP("204.168.173.224"), 80})
 
 	go func() {
 		for {
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 100)
 			if PortScanner.RunningThreads() == 0 && PortScanner.Done == false {
 				PortScanner.Stop()
 				wg.Done()

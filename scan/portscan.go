@@ -22,7 +22,7 @@ func PortScanPool() *cmd.Pool {
 			nmap.OpenDeepIdentify()
 		}
 		value := in.(Address)
-		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, 100*cmd.Config.Timeout)
+		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, cmd.Config.Timeout)
 		switch status {
 		case scanlib.Open:
 			PortHandlerOpen(value)
@@ -43,7 +43,7 @@ func PortHandlerOpen(value Address) {
 		Protocol:   protocol,
 		ServiceApp: nil,
 	}
-	utils.AddPortInfo(value.IP.String(), portInfo, nil)
+	utils.AddPortInfo(value.IP.String(), portInfo)
 }
 
 func PortHandlerNotMatched(value Address, response *scanlib.Response) {
@@ -51,7 +51,7 @@ func PortHandlerNotMatched(value Address, response *scanlib.Response) {
 		Port:     value.Port,
 		Protocol: "unknow",
 	}
-	utils.AddPortInfo(value.IP.String(), portInfo, response)
+	utils.AddPortInfo(value.IP.String(), portInfo)
 }
 
 func PortHandlerMatched(value Address, response *scanlib.Response) {
@@ -66,7 +66,7 @@ func PortHandlerMatched(value Address, response *scanlib.Response) {
 		ServiceApp: services,
 	}
 
-	utils.AddPortInfo(value.IP.String(), portInfo, response)
+	utils.AddPortInfo(value.IP.String(), portInfo)
 	URLRaw := fmt.Sprintf("%s://%s:%d", protocol, value.IP.String(), value.Port)
 	URL, _ := url.Parse(URLRaw)
 	if appfinger.SupportCheck(URL.Scheme) == true {
