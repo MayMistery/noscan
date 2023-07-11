@@ -9,13 +9,13 @@ import (
 
 func TestCheckLive(t *testing.T) {
 	cmd.Config.InputFilepath = "../data/target"
-	cmd.Config.Ping = true
+	//cmd.Config.Ping = true
 	err := InitTarget()
 	if err != nil {
 		return
 	}
 
-	limiter := make(chan struct{}, 10)
+	limiter := make(chan struct{}, 10000)
 
 	wg := sync.WaitGroup{}
 	for host := cmd.IPPools(); host != ""; host = cmd.IPPools() {

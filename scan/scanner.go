@@ -97,11 +97,11 @@ func Scan() error {
 }
 
 func ScannerPool() *cmd.Pool {
-	scanPool := cmd.NewPool(cmd.Config.Threads/4 + 1)
+	scanPool := cmd.NewPool(cmd.Config.Threads/100 + 1)
 	scanPool.Function = func(input interface{}) {
 		host := input.(string)
 		if CheckLive(host) {
-			cmd.ResultLog("[+]%s is alive", host)
+			//cmd.ResultLog("[+]%s is alive", host)
 			for _, port := range cmd.Ports {
 				PortScanner.Push(Address{net.ParseIP(host), port})
 			}

@@ -23513,6 +23513,8 @@ Quest-Password-Manager	Body~="(<span id=\"ctl00_ctl00_ctl00_ContentPlaceHolder_C
 OpenDocMan	Body~="(<a href=\"http:\\/\\/www\\.opendocman\\.com\\/\" target=\"_new\">OpenDocMan v([^\"^\\s]+)<\\/a>)"
 OpenDocMan	Body="<td align=\"left\"><img src=\"images/logo.gif\" alt=\"Site Logo\" border=0></td>"
 OpenDocMan	Body~="(<td valign=\"top\">\\s+Welcome to OpenDocMan\\.?\\s+<p>)"
+HTML5	Body~="(<!DOCTYPE html>)"
+HTML5	Body~="(<html[^>]* manifest=)"
 Censura	Body~="(Powered by: <a[^>]* href=\"http:\\/\\/www.censura.info\">Censura<\\/a> version ([\\d\\.]+))"
 Inout-Music	Body="href=\"http://www.inoutscripts.com/?r=13\">Powered by Inoutscripts</a>"
 PortalApp	Body~="(<img src='[\\/]*images\\/palogo_gr_17.gif' height=23 alt='powered by PortalApp' align=[\\'|\\\"]*[center|middle]+[\\'|\\\"]*><\\/A>)"

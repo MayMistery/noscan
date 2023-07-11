@@ -3,6 +3,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
+	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -13,7 +16,10 @@ func ErrLog(format string, a ...interface{}) {
 
 	go func() {
 		//TODO change filepath to flag
-		file, err := os.OpenFile("../result/err_log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		_, ex, _, _ := runtime.Caller(0)
+		exPath := path.Join(filepath.Dir(ex), "..")
+		errorLogPath := path.Join(exPath, "result/err_log")
+		file, err := os.OpenFile(errorLogPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			fmt.Println("Error opening file:", err, errStr)
 			return
@@ -35,7 +41,10 @@ func ResultLog(format string, a ...interface{}) {
 
 	go func() {
 		//TODO change filepath to flag
-		file, err := os.OpenFile("../result/result_log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		_, ex, _, _ := runtime.Caller(0)
+		exPath := path.Join(filepath.Dir(ex), "..")
+		resultLogPath := path.Join(exPath, "result/result_log")
+		file, err := os.OpenFile(resultLogPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			fmt.Println("Error opening file:", err, errStr)
 			return
