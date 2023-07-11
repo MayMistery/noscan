@@ -71,7 +71,7 @@ func ExecCommandPing(host string) bool {
 	var command *exec.Cmd
 	switch runtime.GOOS {
 	case "windows":
-		command = exec.Command("cmd", "/c", "ping -n 1 -w 1 "+host+" && echo true || echo false")
+		command = exec.Command("cmd.exe", "/c", "ping -n 1 -w 1 "+host+" && echo true || echo false")
 	case "linux":
 		command = exec.Command("/bin/bash", "-c", "ping -c 1 -w 1 "+host+" >/dev/null && echo true || echo false")
 	case "darwin":

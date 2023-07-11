@@ -27,3 +27,25 @@ func ErrLog(format string, a ...interface{}) {
 		}
 	}()
 }
+
+func ResultLog(format string, a ...interface{}) {
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("2006-01-02 15:04:05") + " : "
+	errStr := formattedTime + fmt.Sprintf(format, a...)
+
+	go func() {
+		//TODO change filepath to flag
+		file, err := os.OpenFile("../result/result_log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			fmt.Println("Error opening file:", err, errStr)
+			return
+		}
+		defer file.Close()
+
+		_, err = file.WriteString(errStr + "\n")
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
+	}()
+}

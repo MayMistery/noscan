@@ -9,6 +9,7 @@ import (
 
 func TestCheckLive(t *testing.T) {
 	cmd.Config.InputFilepath = "../data/target"
+	cmd.Config.Ping = true
 	err := InitTarget()
 	if err != nil {
 		return
@@ -19,16 +20,17 @@ func TestCheckLive(t *testing.T) {
 	wg := sync.WaitGroup{}
 	for host := cmd.IPPools(); host != ""; host = cmd.IPPools() {
 		wg.Add(1)
-		limiter <- struct{}{}
-		go func(host string) {
-			if CheckLive(host) {
-				fmt.Println(host)
-			}
-			wg.Done()
-			<-limiter
-		}(host)
+		limiter <- struct{}{} // limit concurrency
 
+		go func(h string) {
+			defer wg.Done()              // ensure Done is called even if CheckLive panics
+			defer func() { <-limiter }() // ensure limiter is emptied even if CheckLive panics
+
+			if CheckLive(h) {
+				fmt.Println(h)
+			}
+		}(host) // pass a copy of host to the goroutine
 	}
 
-	wg.Wait()
+	wg.Wait() // wait for all goroutines to finish
 }

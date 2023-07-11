@@ -101,6 +101,7 @@ func ScannerPool() *cmd.Pool {
 	scanPool.Function = func(input interface{}) {
 		host := input.(string)
 		if CheckLive(host) {
+			cmd.ResultLog("[+]%s is alive", host)
 			for _, port := range cmd.Ports {
 				PortScanner.Push(Address{net.ParseIP(host), port})
 			}
