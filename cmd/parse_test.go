@@ -6,9 +6,8 @@ import (
 )
 
 func TestName(t *testing.T) {
-	var cfg Configs
-	cfg.InputFilepath = "../data/target"
-	cidrIPs, err := ReadIPAddressesFromFile(cfg)
+	inputFilepath := "../data/target"
+	cidrIPs, err := ReadIPAddressesFromFile(inputFilepath)
 	if err != nil {
 		fmt.Println("[-]Read target ip fail")
 	}
@@ -25,7 +24,7 @@ func TestName(t *testing.T) {
 	}
 	IPPools = GetPools(ipPoolsFuncList)
 
-	for i := 0; i < 513; i++ {
-		fmt.Println(IPPools())
+	for host := IPPools(); host != ""; host = IPPools() {
+		fmt.Println(host)
 	}
 }

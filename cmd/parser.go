@@ -15,8 +15,7 @@ type IPPool struct {
 	ipNet *net.IPNet
 }
 
-func ReadIPAddressesFromFile(config Configs) ([]string, error) {
-	filepath := config.InputFilepath
+func ReadIPAddressesFromFile(filepath string) ([]string, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		log.Printf("Fail to open the target file %v", err)
@@ -74,13 +73,8 @@ func InTarget(ip string) bool {
 
 func GetPools(ipPoolFuncList []func() string) func() string {
 	return func() string {
-
 		for _, ipPoolFunc := range ipPoolFuncList {
-			//for ip := ipPoolFunc(); ip != ""; ip = ipPoolFunc() {
-			//	return ip
-			//}
-			ip := ipPoolFunc()
-			if ip != "" {
+			if ip := ipPoolFunc(); ip != "" {
 				return ip
 			}
 		}

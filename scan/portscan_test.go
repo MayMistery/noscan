@@ -15,7 +15,7 @@ func TestPortScan(t *testing.T) {
 	cmd.Config.DBFilePath = "../data/database.db"
 	cmd.Config.OutputFilepath = "../result/result.json"
 	cmd.Config.DeepInspection = true
-	cmd.Config.Timeout = 3 * time.Second
+	cmd.Config.Timeout = 10 * time.Second
 	bolt.InitAsyncDatabase()
 	utils.InitResultMap()
 
@@ -36,7 +36,7 @@ func TestPortScan(t *testing.T) {
 
 	go func() {
 		for {
-			time.Sleep(time.Second * 100)
+			time.Sleep(time.Second * 40)
 			if PortScanner.RunningThreads() == 0 && PortScanner.Done == false {
 				PortScanner.Stop()
 				wg.Done()

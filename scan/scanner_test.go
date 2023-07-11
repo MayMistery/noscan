@@ -7,9 +7,8 @@ import (
 )
 
 func TestInitTarget(t *testing.T) {
-	var cfg cmd.Configs
-	cfg.InputFilepath = "../data/target"
-	InitTarget(cfg)
+	cmd.Config.InputFilepath = "../data/target"
+	InitTarget()
 	for i := 0; i < 513; i++ {
 		fmt.Println(cmd.IPPools())
 	}

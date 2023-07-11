@@ -19,8 +19,8 @@ var (
 	HttpScanner *cmd.Pool
 )
 
-func InitTarget(cfg cmd.Configs) error {
-	cidrIPs, err := cmd.ReadIPAddressesFromFile(cfg)
+func InitTarget() error {
+	cidrIPs, err := cmd.ReadIPAddressesFromFile(cmd.Config.InputFilepath)
 	if err != nil {
 		cmd.ErrLog("Read target ip fail %v", err)
 		fmt.Println("[-]Read target ip fail")
@@ -80,7 +80,7 @@ func StopScanner(wg *sync.WaitGroup) {
 }
 
 func Scan() error {
-	err := InitTarget(cmd.Config)
+	err := InitTarget()
 	wg := InitScanner()
 	if err != nil {
 		cmd.ErrLog("InitTarget error %v", err)
