@@ -24,7 +24,9 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
-# EXPOSE 8080
+COPY --from=builder /app/noname .
+COPY --from=builder /app/result/ /app/result/
+COPY --from=builder /app/data/fingerprint.txt /app/data/fingerprint.txt
+COPY --from=builder /app/data/target /app/data/target
 
-# 设置容器启动命令
 CMD ["./noname"]
