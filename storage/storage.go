@@ -14,3 +14,8 @@ type IpCache struct {
 	Services   []*cmd.PortInfo
 	Timestamp  string
 }
+
+type BannerCache struct {
+	Ip     string `storm:"id,increment"`
+	Banner string
+}

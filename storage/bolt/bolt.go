@@ -235,3 +235,51 @@ func NewDBPool() *cmd.Pool {
 //
 //	//TODO handle db error
 //}
+
+func (s *Storage) SaveBannerCache(bannerCache *storage.BannerCache) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	err := s.Ipdb.Save(bannerCache)
+	if err != nil {
+		cmd.ErrLog("save banner to db fail %v", err)
+	}
+	return err
+}
+
+func (s *Storage) GetBannerCache(ip string) (*storage.BannerCache, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	var bannerCache storage.BannerCache
+	err := s.Ipdb.One("Ip", ip, &bannerCache)
+	if err != nil {
+		//cmd.ErrLog("Get ip from db fail %v", err)
+		return nil, err
+	}
+
+	return &bannerCache, nil
+}
+
+func (s *Storage) UpdateBannerCache(bannerCache *storage.BannerCache) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, err := s.GetBannerCache(bannerCache.Ip); err != nil {
+		return s.SaveBannerCache(bannerCache)
+	}
+	err := s.Ipdb.Update(bannerCache)
+
+	if err != nil {
+		cmd.ErrLog("update banner db fail %v", err)
+	}
+
+	return err
+}
+
+func UpdateBannerCacheAsync(bannerCache *storage.BannerCache) {
+	DBPool.Push(poolInput{
+		action: "UpdateBannerCache",
+		args:   bannerCache,
+	})
+}

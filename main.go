@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
 	"github.com/MayMistery/noscan/scan"
+	"github.com/MayMistery/noscan/scan/scanlib/appfinger"
 	"github.com/MayMistery/noscan/storage/bolt"
 	"github.com/MayMistery/noscan/utils"
-	"github.com/lcvvvv/appfinger"
 	"os"
 	"time"
 )
