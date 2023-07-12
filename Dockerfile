@@ -1,6 +1,8 @@
 # 使用Go官方镜像作为基础镜像
 FROM golang:1.20-alpine as builder
 
+ENV GOPROXY=https://goproxy.cn,direct
+
 # 设置工作目录
 WORKDIR /app
 
@@ -21,9 +23,6 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
-
-# 从builder阶段复制二进制文件到当前阶段
-COPY --from=builder /app/noname .
 
 # EXPOSE 8080
 
