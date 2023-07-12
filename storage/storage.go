@@ -4,7 +4,7 @@ import "github.com/MayMistery/noscan/cmd"
 
 //type PortInfoStore struct {
 //	*cmd.PortInfo
-//	Banner *scanlib.Response
+//	Banner *lib.Response
 //}
 
 type IpCache struct {

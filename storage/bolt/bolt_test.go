@@ -3,7 +3,7 @@ package bolt
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/scanlib"
+	"github.com/MayMistery/noscan/lib/scanlib"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/boltdb/bolt"
 	"github.com/stretchr/testify/assert"

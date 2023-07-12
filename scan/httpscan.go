@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/scanlib"
-	"github.com/MayMistery/noscan/scan/scanlib/appfinger"
+	appfinger2 "github.com/MayMistery/noscan/lib/appfinger"
+	"github.com/MayMistery/noscan/lib/scanlib"
 	"github.com/MayMistery/noscan/utils"
 	"net/http"
 	"net/url"
@@ -33,28 +33,28 @@ func HttpScanPool() *cmd.Pool {
 		response := value.response
 		req := value.req
 		cli := value.client
-		if appfinger.SupportCheck(URL.Scheme) == false {
+		if appfinger2.SupportCheck(URL.Scheme) == false {
 			cmd.ErrLog("%s %v", URL.Host, errors.New(NotSupportProtocol))
 			fmt.Println(URL, errors.New(NotSupportProtocol))
 			return
 		}
-		var banner *appfinger.Banner
-		var finger *appfinger.FingerPrint
+		var banner *appfinger2.Banner
+		var finger *appfinger2.FingerPrint
 		var err error
 		if response == nil || req != nil || cli != nil {
-			banner, err = appfinger.GetBannerWithURL(URL, req, cli)
+			banner, err = appfinger2.GetBannerWithURL(URL, req, cli)
 			if err != nil {
 				HttpHandlerError(URL, err)
 				return
 			}
-			finger = appfinger.Search(URL, banner)
+			finger = appfinger2.Search(URL, banner)
 		} else {
-			banner, err = appfinger.GetBannerWithURL(URL, req, cli)
+			banner, err = appfinger2.GetBannerWithURL(URL, req, cli)
 			if err != nil {
 				HttpHandlerError(URL, err)
 				return
 			}
-			finger = appfinger.Search(URL, banner)
+			finger = appfinger2.Search(URL, banner)
 		}
 		if len(finger.ProductName) > 0 {
 			HandleAppFingerprint(URL, finger.ProductName)

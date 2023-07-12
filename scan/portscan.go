@@ -3,9 +3,9 @@ package scan
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/scan/scanlib"
-	"github.com/MayMistery/noscan/scan/scanlib/appfinger"
-	"github.com/MayMistery/noscan/scan/scanlib/simplehttp"
+	"github.com/MayMistery/noscan/lib/appfinger"
+	"github.com/MayMistery/noscan/lib/scanlib"
+	"github.com/MayMistery/noscan/lib/simplehttp"
 	"github.com/MayMistery/noscan/utils"
 	"net/http"
 	"net/url"

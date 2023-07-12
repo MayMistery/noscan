@@ -3,8 +3,8 @@ package httpfinger
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/MayMistery/noscan/scan/scanlib/appfinger/iconhash"
-	"github.com/MayMistery/noscan/scan/scanlib/simplehttp"
+	"github.com/MayMistery/noscan/lib/appfinger/iconhash"
+	"github.com/MayMistery/noscan/lib/simplehttp"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/lcvvvv/stdio/chinese"
 	"net/http"

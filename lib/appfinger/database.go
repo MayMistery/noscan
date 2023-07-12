@@ -3,7 +3,7 @@ package appfinger
 import (
 	"errors"
 	"fmt"
-	"github.com/MayMistery/noscan/scan/scanlib/appfinger/httpfinger"
+	"github.com/MayMistery/noscan/lib/appfinger/httpfinger"
 	"io"
 	"os"
 	"reflect"

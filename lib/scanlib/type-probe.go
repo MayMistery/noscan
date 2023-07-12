@@ -3,7 +3,7 @@ package scanlib
 import (
 	"errors"
 	"fmt"
-	"github.com/MayMistery/noscan/scan/scanlib/simplenet"
+	"github.com/MayMistery/noscan/lib/simplenet"
 	"regexp"
 	"strconv"
 	"strings"
