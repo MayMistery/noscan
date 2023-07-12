@@ -6,6 +6,8 @@ import (
 	"github.com/MayMistery/noscan/lib/appfinger"
 	"github.com/MayMistery/noscan/lib/scanlib"
 	"github.com/MayMistery/noscan/lib/simplehttp"
+	"github.com/MayMistery/noscan/storage"
+	"github.com/MayMistery/noscan/storage/bolt"
 	"github.com/MayMistery/noscan/utils"
 	"net/http"
 	"net/url"
@@ -67,6 +69,7 @@ func PortHandlerMatched(value Address, response *scanlib.Response) {
 	}
 
 	utils.AddPortInfo(value.IP.String(), portInfo)
+	bolt.UpdateBannerCacheAsync(&storage.BannerCache{Ip: value.IP.String(), Port: value.Port, Banner: response.Raw})
 	URLRaw := fmt.Sprintf("%s://%s:%d", protocol, value.IP.String(), value.Port)
 	URL, _ := url.Parse(URLRaw)
 	if appfinger.SupportCheck(URL.Scheme) == true {

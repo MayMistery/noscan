@@ -44,6 +44,7 @@ func InitDatabaseFS(fs io.Reader) (n int, lastErr error) {
 			lastErr = errors.New(line + "invalid")
 			continue
 		}
+		r[0] = strings.TrimRight(r[0], "\t")
 		err := add(r[0], r[1])
 		if err != nil {
 			lastErr = err

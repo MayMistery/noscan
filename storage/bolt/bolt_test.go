@@ -3,7 +3,6 @@ package bolt
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	"github.com/MayMistery/noscan/lib/scanlib"
 	"github.com/MayMistery/noscan/storage"
 	"github.com/boltdb/bolt"
 	"github.com/stretchr/testify/assert"
@@ -61,17 +60,13 @@ func TestUpdateCache(t *testing.T) {
 
 	// 准备测试数据
 	ip := "127.0.0.1"
-	portInfoStore := &storage.PortInfoStore{
-		PortInfo: &cmd.PortInfo{
+	ipCache := storage.IpCache{
+		Ip: ip,
+		Services: []*cmd.PortInfo{{
 			Port:       8080,
 			Protocol:   "tcp",
 			ServiceApp: []string{"http"},
-		},
-		Banner: &scanlib.Response{},
-	}
-	ipCache := storage.IpCache{
-		Ip:         ip,
-		Services:   []*storage.PortInfoStore{portInfoStore},
+		}},
 		DeviceInfo: "Device 1",
 		Honeypot:   []string{"Honeypot 1"},
 	}
@@ -156,17 +151,11 @@ func TestHighConcurrency(t *testing.T) {
 	cmd.Config.DBFilePath = "../../data/database.db"
 	InitAsyncDatabase()
 	ip := "127.0.0.2"
-	portInfoStore := &storage.PortInfoStore{
-		PortInfo: &cmd.PortInfo{
-			Port:       8080,
-			Protocol:   "tcp",
-			ServiceApp: []string{"http"},
-		},
-		Banner: &scanlib.Response{},
-	}
 	ipCache := storage.IpCache{
-		Ip:         ip,
-		Services:   []*storage.PortInfoStore{portInfoStore},
+		Ip: ip,
+		Services: []*cmd.PortInfo{{Port: 8080,
+			Protocol:   "tcp",
+			ServiceApp: []string{"http"}}},
 		DeviceInfo: "Device 1",
 		Honeypot:   []string{"Honeypot 1"},
 	}

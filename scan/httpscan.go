@@ -134,7 +134,7 @@ func HandleAppFingerprint(url *url.URL, inputFinger []string) {
 		}
 
 		if matchedDevice == "honeypot" {
-			honeyInfo := url.Port() + "/N"
+			honeyInfo := url.Port() + "/" + inputFinger[i]
 			//TODO strip honeypot name
 			honeyPot = append(honeyPot, honeyInfo)
 		} else if matchedDevice == "other" {
@@ -148,6 +148,10 @@ func HandleAppFingerprint(url *url.URL, inputFinger []string) {
 
 	port, _ := strconv.Atoi(url.Port())
 	utils.UpdateServiceInfo(url.Hostname(), port, service)
-	utils.UpdateDeviceInfo(url.Hostname(), deviceInfo)
-	utils.UpdateHoneypot(url.Hostname(), honeyPot)
+	if len(deviceInfo) > 0 {
+		utils.UpdateDeviceInfo(url.Hostname(), deviceInfo)
+	}
+	if len(honeyPot) > 0 {
+		utils.UpdateHoneypot(url.Hostname(), honeyPot)
+	}
 }

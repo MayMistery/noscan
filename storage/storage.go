@@ -17,5 +17,6 @@ type IpCache struct {
 
 type BannerCache struct {
 	Ip     string `storm:"id,increment"`
+	Port   int
 	Banner string
 }

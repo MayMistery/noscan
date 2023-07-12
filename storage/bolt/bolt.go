@@ -219,6 +219,10 @@ func NewDBPool() *cmd.Pool {
 			func() {
 				err = DB.UpdateHoneypot(in.args.(*honeypotInput))
 			}()
+		case "UpdateBannerCache":
+			func() {
+				err = DB.UpdateBannerCache(in.args.(*storage.BannerCache))
+			}()
 		}
 
 		if err != nil {
