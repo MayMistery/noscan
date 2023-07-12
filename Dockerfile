@@ -1,28 +1,31 @@
-FROM go:1.20
-LABEL authors="noname"
+# 使用Go官方镜像作为基础镜像
+FROM golang:1.20-alpine as builder
 
-# Set destination for COPY
+# 设置工作目录
 WORKDIR /app
 
-# Download Go modules
-COPY go.mod go.sum ./
+# 将go mod下载的依赖复制到容器的缓存中
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
 
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/engine/reference/builder/#copy
-COPY *.go ./
-COPY .version/*.go ./.version/
-COPY utils/*.go ./utils/
-COPY cmd/*.go ./cmd/
-COPY scan/*.go ./scan/
-COPY rules/*.go ./rules/
-COPY utils/*.go ./utils/
+# 将项目文件复制到容器内
+COPY . .
 
-# Copy target
-COPY target/* ./target/
+# 编译Go代码生成可执行文件
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o noname .
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /noscan
+# 创建一个新的阶段，用于生成较小的最终镜像
+FROM alpine:latest
 
-# Run
-CMD ["/noscan"]
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# 从builder阶段复制二进制文件到当前阶段
+COPY --from=builder /app/noname .
+
+# EXPOSE 8080
+
+# 设置容器启动命令
+CMD ["./noname"]
