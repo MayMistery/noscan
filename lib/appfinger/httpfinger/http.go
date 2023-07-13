@@ -60,13 +60,7 @@ func GetBannerWithURL(URL *url.URL, req *http.Request, cli *http.Client) (*Banne
 	return banner, err
 }
 
-func GetBannerWithResponse(URL *url.URL, response string, req *http.Request, cli *http.Client) (*Banner, error) {
-	if URL.Scheme == "https" {
-		return GetBannerWithURL(URL, req, cli)
-	}
-	if statusCode := getStatusCode(response); statusCode >= 300 && statusCode <= 400 {
-		return GetBannerWithURL(URL, req, cli)
-	}
+func GetBannerWithResponse(URL *url.URL, response string) (*Banner, error) {
 	header, body := simplehttp.SplitHeaderAndBody(response)
 	body = chinese.ToUTF8(body)
 

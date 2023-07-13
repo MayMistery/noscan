@@ -10,38 +10,10 @@ import (
 	"time"
 )
 
-func CheckLive(host string) bool {
-
-	if cmd.Config.Ping == true {
-		//Use system ping command
-		return ExecCommandPing(host)
-	} else {
-		//Try icmp without listening
-		conn, err := net.DialTimeout("ip4:icmp", "127.0.0.1", 3*time.Second)
-		defer func() {
-			if conn != nil {
-				err := conn.Close()
-				if err != nil {
-					cmd.ErrLog("connect close error %v", err)
-					return
-				}
-			}
-		}()
-		if err == nil {
-			return IcmpAlive(host)
-		} else {
-			//Use system ping command
-			//TODO add it
-			//fmt.Println("The current user permissions unable to send icmp packets")
-			//fmt.Println("start ping")
-			return ExecCommandPing(host)
-		}
-	}
-}
-
 func IcmpAlive(host string) bool {
 	startTime := time.Now()
-	conn, err := net.DialTimeout("ip4:icmp", host, 6*time.Second)
+	icmpaliveTimeout := cmd.Config.Timeout + 2*time.Second
+	conn, err := net.DialTimeout("ip4:icmp", host, icmpaliveTimeout)
 	defer func() {
 		if conn != nil {
 			conn.Close()
@@ -51,7 +23,7 @@ func IcmpAlive(host string) bool {
 	if err != nil {
 		return false
 	}
-	if err := conn.SetDeadline(startTime.Add(6 * time.Second)); err != nil {
+	if err := conn.SetDeadline(startTime.Add(icmpaliveTimeout)); err != nil {
 		return false
 	}
 	msg := makeMsg(host)

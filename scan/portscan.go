@@ -97,7 +97,7 @@ func pushURLTarget(URL *url.URL, response *scanlib.Response) {
 		simplehttp.SetTimeout(cli, cmd.Config.Timeout)
 	}
 
-	HttpScanner.Push(HttpTarget{URL, response, nil, cli})
+	HttpScanner.Push(HttpTarget{URL, nil, cli})
 }
 
 func getProductVersionFromNmap(response *scanlib.Response) string {

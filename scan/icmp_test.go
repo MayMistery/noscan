@@ -23,10 +23,10 @@ func TestCheckLive(t *testing.T) {
 		limiter <- struct{}{} // limit concurrency
 
 		go func(h string) {
-			defer wg.Done()              // ensure Done is called even if CheckLive panics
-			defer func() { <-limiter }() // ensure limiter is emptied even if CheckLive panics
+			defer wg.Done()              // ensure Done is called even if CheckIcmpLive panics
+			defer func() { <-limiter }() // ensure limiter is emptied even if CheckIcmpLive panics
 
-			if CheckLive(h) {
+			if CheckIcmpLive(h) {
 				fmt.Println(h)
 			}
 		}(host) // pass a copy of host to the goroutine

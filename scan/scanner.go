@@ -3,6 +3,7 @@ package scan
 import (
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
+	"github.com/MayMistery/noscan/lib/simplenet"
 	"net"
 	"sync"
 	"time"
@@ -49,6 +50,19 @@ func InitTarget() error {
 
 func InitScanner() *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
+	conn, err := net.DialTimeout("ip4:icmp", "127.0.0.1", cmd.Config.Timeout)
+	if err != nil {
+		cmd.Config.Ping = false
+	}
+	defer func() {
+		if conn != nil {
+			err := conn.Close()
+			if err != nil {
+				cmd.ErrLog("connect close error %v", err)
+				return
+			}
+		}
+	}()
 
 	Scanner = ScannerPool()
 	PortScanner = PortScanPool()
@@ -63,7 +77,7 @@ func InitScanner() *sync.WaitGroup {
 
 func StopScanner(wg *sync.WaitGroup) {
 	for {
-		time.Sleep(time.Second * 3)
+		time.Sleep(cmd.Config.Timeout * 3)
 		if Scanner.RunningThreads() == 0 && Scanner.Done == false {
 			Scanner.Stop()
 			wg.Done()
@@ -100,12 +114,40 @@ func ScannerPool() *cmd.Pool {
 	scanPool := cmd.NewPool(cmd.Config.Threads/20 + 1)
 	scanPool.Function = func(input interface{}) {
 		host := input.(string)
-		if CheckLive(host) {
+		if CheckIcmpLive(host) {
 			//cmd.ResultLog("[+]%s is alive", host)
-			for _, port := range cmd.Ports {
-				PortScanner.Push(Address{net.ParseIP(host), port})
-			}
+			HandleAliveHost(host)
+		} else if CheckCommonPort(host) {
+			HandleAliveHost(host)
 		}
+
 	}
 	return scanPool
+}
+
+func HandleAliveHost(host string) {
+	for _, port := range cmd.Ports {
+		PortScanner.Push(Address{net.ParseIP(host), port})
+	}
+}
+
+func CheckIcmpLive(host string) bool {
+	if cmd.Config.Ping == true {
+		//Use system ping command
+		return ExecCommandPing(host)
+	} else {
+		return IcmpAlive(host)
+	}
+}
+
+func CheckCommonPort(host string) bool {
+	var commonPorts = []int{22, 23, 80, 139, 512, 443, 445, 3389}
+	for _, port := range commonPorts {
+		addr := fmt.Sprintf("%s:%d", host, port)
+		_, err := simplenet.Send("tcp", false, addr, "\r\n", cmd.Config.Timeout, 128)
+		if err == nil {
+			return true
+		}
+	}
+	return false
 }

@@ -81,7 +81,7 @@ func (p *probe) match(s string) *FingerPrint {
 	return f
 }
 
-var probeExprRegx = regexp.MustCompile("^(UDP|TCP) ([a-zA-Z0-9-_./]+) (?:q\\|([^|]*)\\|)$")
+var probeExprRegx = regexp.MustCompile("^(UDP|TCP) ([a-zA-Z0-9-_./]+) (?:q\\|([^|]*)\\|)")
 var probeIntRegx = regexp.MustCompile(`^(\d+)$`)
 var probeStrRegx = regexp.MustCompile(`^([a-zA-Z0-9-_./]+)$`)
 

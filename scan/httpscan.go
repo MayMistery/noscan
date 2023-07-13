@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/MayMistery/noscan/cmd"
-	appfinger2 "github.com/MayMistery/noscan/lib/appfinger"
-	"github.com/MayMistery/noscan/lib/scanlib"
+	"github.com/MayMistery/noscan/lib/appfinger"
+	"github.com/MayMistery/noscan/lib/simplehttp"
 	"github.com/MayMistery/noscan/utils"
+	wappalyzer "github.com/projectdiscovery/wappalyzergo"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -15,10 +17,9 @@ import (
 )
 
 type HttpTarget struct {
-	URL      *url.URL
-	response *scanlib.Response
-	req      *http.Request
-	client   *http.Client
+	URL    *url.URL
+	req    *http.Request
+	client *http.Client
 }
 
 const (
@@ -30,34 +31,19 @@ func HttpScanPool() *cmd.Pool {
 	httpScanPool.Function = func(in interface{}) {
 		value := in.(HttpTarget)
 		URL := value.URL
-		response := value.response
 		req := value.req
 		cli := value.client
-		if appfinger2.SupportCheck(URL.Scheme) == false {
-			cmd.ErrLog("%s %v", URL.Host, errors.New(NotSupportProtocol))
-			fmt.Println(URL, errors.New(NotSupportProtocol))
+
+		resp, err := httpRequest(URL, req, cli)
+		serviceApp1 := getServiceAppFromAppFinger(URL, resp)
+		serviceApp2 := getServiceAppFromWappalyzer(resp.Response)
+		if err != nil {
+			HttpHandlerError(URL, err)
 			return
 		}
-		var banner *appfinger2.Banner
-		var finger *appfinger2.FingerPrint
-		var err error
-		if response == nil || req != nil || cli != nil {
-			banner, err = appfinger2.GetBannerWithURL(URL, req, cli)
-			if err != nil {
-				HttpHandlerError(URL, err)
-				return
-			}
-			finger = appfinger2.Search(URL, banner)
-		} else {
-			banner, err = appfinger2.GetBannerWithURL(URL, req, cli)
-			if err != nil {
-				HttpHandlerError(URL, err)
-				return
-			}
-			finger = appfinger2.Search(URL, banner)
-		}
-		if len(finger.ProductName) > 0 {
-			HandleAppFingerprint(URL, finger.ProductName)
+		serviceApp := append(serviceApp1, serviceApp2...)
+		if len(serviceApp) > 0 {
+			HandleAppFingerprint(URL, serviceApp)
 		}
 	}
 
@@ -67,6 +53,54 @@ func HttpScanPool() *cmd.Pool {
 func HttpHandlerError(url *url.URL, err error) {
 	cmd.ErrLog("URLScanner Error: %s %v", url.String(), err)
 	fmt.Println("URLScanner Error: ", url.String(), err)
+}
+
+func httpRequest(URL *url.URL, req *http.Request, cli *http.Client) (*simplehttp.Response, error) {
+	if req == nil {
+		req, _ = simplehttp.NewRequest(http.MethodGet, URL.String(), nil)
+	}
+
+	req.Header.Set("User-Agent", simplehttp.RandomUserAgent())
+
+	if cli == nil {
+		cli = simplehttp.NewClient()
+	}
+
+	resp, err := simplehttp.Do(cli, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func getServiceAppFromAppFinger(url *url.URL, resp *simplehttp.Response) []string {
+	if appfinger.SupportCheck(url.Scheme) == false {
+		cmd.ErrLog("%s %v", url.Host, errors.New(NotSupportProtocol))
+		fmt.Println(url, errors.New(NotSupportProtocol))
+		return []string{}
+	}
+	var banner *appfinger.Banner
+	var finger *appfinger.FingerPrint
+	banner, _ = appfinger.GetBannerWithResponse(url, resp.Raw.String())
+	finger = appfinger.Search(url, banner)
+	return finger.ProductName
+}
+
+func getServiceAppFromWappalyzer(resp *http.Response) []string {
+	data, _ := io.ReadAll(resp.Body) // Ignoring error for example
+
+	var serviceApp []string
+	wappalyzerClient, _ := wappalyzer.New()
+	fingerprints := wappalyzerClient.Fingerprint(resp.Header, data)
+	for key := range fingerprints {
+		if strings.Contains(key, ":") {
+			serviceApp = append(serviceApp, strings.Replace(key, ":", "/", 1))
+		} else {
+			serviceApp = append(serviceApp, key+"/N")
+		}
+	}
+	return serviceApp
 }
 
 //webcam : "摄像头" "webcam" "camera"
