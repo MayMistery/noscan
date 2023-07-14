@@ -92,7 +92,7 @@ func (ipPool *IPPool) SetPool(cidrIp string) error {
 	return nil
 }
 
-func (ipPool IPPool) GetPool() func() string {
+func (ipPool *IPPool) GetPool() func() string {
 	var counter int64 = 0
 	start, end := IPRange(ipPool.ipNet)
 	return func() string {
@@ -110,7 +110,7 @@ func (ipPool IPPool) GetPool() func() string {
 	}
 }
 
-func (ipPool IPPool) GetPoolSize() int64 {
+func (ipPool *IPPool) GetPoolSize() int64 {
 	start, end := IPRange(ipPool.ipNet)
 	startIpInt := big.NewInt(0)
 	startIpInt.SetBytes(start.To4())
