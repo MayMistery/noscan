@@ -174,6 +174,9 @@ func UpdateServiceInfo(host string, port int, serviceInfo []string) {
 		if tmp.Port == port {
 			tmp.ServiceApp = RemoveDuplicateStringArr(append(tmp.ServiceApp, serviceInfo...))
 			bolt.UpdateServiceInfoAsync(host, port, tmp)
+			mu.Lock()
+			Result[host].Services[i] = tmp
+			mu.Unlock()
 			return
 		}
 	}
