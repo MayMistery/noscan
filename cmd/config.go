@@ -32,6 +32,7 @@ type Configs struct {
 	Timeout        time.Duration
 	DeepInspection bool
 	Debug          bool
+	CIDR           string
 }
 
 var portList = map[string]int{

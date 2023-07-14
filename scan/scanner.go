@@ -5,6 +5,7 @@ import (
 	"github.com/MayMistery/noscan/cmd"
 	"github.com/MayMistery/noscan/lib/simplenet"
 	"net"
+	"strings"
 	"sync"
 	"time"
 )
@@ -20,17 +21,36 @@ var (
 	HttpScanner *cmd.Pool
 )
 
-func InitTarget() error {
-	cidrIPs, err := cmd.ReadIPAddressesFromFile(cmd.Config.InputFilepath)
-	if err != nil {
-		cmd.ErrLog("Read target ip fail %v", err)
-		fmt.Println("[-]Read target ip fail")
-		return err
-	}
+func CheckCIDR(CIDRInput string) (ipList []string, err error) {
+	ipList = strings.Split(CIDRInput, ",")
 
+	return ipList, nil
+}
+
+func InitTarget() error {
+	var CIDR []string
 	var ipPool cmd.IPPool
 	var ipPoolsFuncList []func() string
-	for _, cidrIp := range cidrIPs {
+
+	if cmd.Config.CIDR == "default" {
+		cidrIPs, err := cmd.ReadIPAddressesFromFile(cmd.Config.InputFilepath)
+		if err != nil {
+			cmd.ErrLog("Read target ip fail %v", err)
+			fmt.Println("[-]Read target ip fail")
+			return err
+		}
+		CIDR = cidrIPs
+	} else {
+		cidrIPs, err := CheckCIDR(cmd.Config.CIDR)
+		if err != nil {
+			cmd.ErrLog("[-] Input wrong CIDR %v", err)
+			panic(err)
+			return err
+		}
+		CIDR = cidrIPs
+	}
+
+	for _, cidrIp := range CIDR {
 		err := ipPool.SetPool(cidrIp)
 		if err != nil {
 			cmd.ErrLog("SetPool fail %v", err)
@@ -40,7 +60,6 @@ func InitTarget() error {
 		cmd.IPNetPools = append(cmd.IPNetPools, ipPool)
 		ipPoolsFuncList = append(ipPoolsFuncList, ipPool.GetPool())
 	}
-
 	cmd.IPPools = cmd.GetPools(ipPoolsFuncList)
 
 	//Init ports array

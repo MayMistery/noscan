@@ -13,3 +13,7 @@ func TestInitTarget(t *testing.T) {
 		fmt.Println(cmd.IPPools())
 	}
 }
+
+func TestCIDR(t *testing.T) {
+	CheckCIDR("127.0.0.1/24,196.1.168.1,196.1.168.1,196.1.168.1,196.1.168.1")
+}
