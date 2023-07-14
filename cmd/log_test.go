@@ -16,5 +16,5 @@ func TestErrLog(t *testing.T) {
 	ErrLog("hello")
 	ErrLog("hello")
 	ErrLog("hello")
-	time.Sleep(100 * time.Second)
+	time.Sleep(5 * time.Second)
 }

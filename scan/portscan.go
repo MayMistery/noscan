@@ -15,6 +15,8 @@ import (
 	"time"
 )
 
+// PortScanPool creates a new pool for port scanning.
+// It sets the function of the pool to be a function that scans a single port.
 func PortScanPool() *cmd.Pool {
 	portScanPool := cmd.NewPool(cmd.Config.Threads)
 	portScanPool.Function = func(in interface{}) {
@@ -38,6 +40,8 @@ func PortScanPool() *cmd.Pool {
 	return portScanPool
 }
 
+// PortHandlerOpen handles the case when a port is open during port scanning.
+// It guesses the protocol based on the port number and updates the port information.
 func PortHandlerOpen(value Address) {
 	protocol := scanlib.GuessProtocol(value.Port)
 	portInfo := &cmd.PortInfo{
@@ -48,6 +52,8 @@ func PortHandlerOpen(value Address) {
 	utils.AddPortInfo(value.IP.String(), portInfo)
 }
 
+// PortHandlerNotMatched handles the case when a port does not match any fingerprints during port scanning.
+// It sets the protocol to "unknown" and updates the port information.
 func PortHandlerNotMatched(value Address, response *scanlib.Response) {
 	portInfo := &cmd.PortInfo{
 		Port:     value.Port,
@@ -56,6 +62,9 @@ func PortHandlerNotMatched(value Address, response *scanlib.Response) {
 	utils.AddPortInfo(value.IP.String(), portInfo)
 }
 
+// PortHandlerMatched handles the case when a port matches a fingerprint during port scanning.
+// It gets the protocol from the fingerprint, gets the product version, and updates the port information and banner cache.
+// It also pushes the URL to the HTTP scanner if the URL scheme is supported by the app finger.
 func PortHandlerMatched(value Address, response *scanlib.Response) {
 	protocol := response.FingerPrint.Service
 	var services []string
@@ -78,6 +87,8 @@ func PortHandlerMatched(value Address, response *scanlib.Response) {
 	}
 }
 
+// pushURLTarget pushes the given URL to the HTTP scanner.
+// It creates a new client if necessary, sets the proxy and timeout if specified, and pushes the HTTP target to the HTTP scanner.
 func pushURLTarget(URL *url.URL, response *scanlib.Response) {
 	var cli *http.Client
 	//判断是否初始化client
@@ -100,6 +111,8 @@ func pushURLTarget(URL *url.URL, response *scanlib.Response) {
 	HttpScanner.Push(HttpTarget{URL, nil, cli})
 }
 
+// getProductVersionFromNmap gets the product version from a scanlib.Response.
+// It returns a string that combines the product name and version, separated by a "/".
 func getProductVersionFromNmap(response *scanlib.Response) string {
 	var (
 		version string

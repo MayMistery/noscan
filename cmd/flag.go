@@ -42,11 +42,15 @@ func Flag(config *Configs) {
 	flag.IntVar(&timeout, "timeout", 3, "connect time out")
 	flag.BoolVar(&config.DeepInspection, "simple", true, "close deep identify")
 	flag.BoolVar(&config.Debug, "debug", false, "open go pprof")
+	flag.BoolVar(&config.help, "help", false, "print help info")
 
 	config.Timeout = time.Duration(timeout) * time.Second
 	// TODO to add flags and corresponding var
 
-	//flag.PrintDefaults()
-
 	flag.Parse()
+
+	if config.help == true {
+		flag.PrintDefaults()
+		// maybe need to exit
+	}
 }

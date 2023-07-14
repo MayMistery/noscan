@@ -43,12 +43,19 @@ func Exec() {
 	dbWaitGroup := bolt.InitAsyncDatabase()
 	utils.InitResultMap()
 
+	defer func() {
+		bolt.CloseDatabase(dbWaitGroup)
+		dbWaitGroup.Wait()
+	}()
+
+	// if the Debug flag is set, start a goroutine that serves runtime profiling data via HTTP
 	if cmd.Config.Debug {
 		go func() {
 			log.Println(http.ListenAndServe(":38899", nil))
 		}()
 	}
 
+	// open the rules file
 	fs, _ := os.Open(cmd.Config.RulesFilePath)
 	if n, err := appfinger.InitDatabaseFS(fs); err != nil {
 		fmt.Println("[-]指纹库加载失败，请检查【fingerprint.txt】文件", err)
@@ -56,18 +63,16 @@ func Exec() {
 		fmt.Printf("[+]成功加载HTTP指纹:[%d]条", n)
 	}
 
+	// start scanning
 	err := scan.Scan()
 	if err != nil {
 		fmt.Println("[-]Scan error", err)
 	}
+
+	// output result
 	if cmd.Config.JsonOutput {
 		utils.OutputResultMap()
 	} else {
 		//TODO add terminal output
 	}
-
-	defer func() {
-		bolt.CloseDatabase(dbWaitGroup)
-		dbWaitGroup.Wait()
-	}()
 }

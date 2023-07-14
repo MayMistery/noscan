@@ -22,13 +22,14 @@ test-noscan: ## Run noscan tests
 lint: lint-noscan ## Run all linters
 
 .PHONY: lint-noscan
-lint-backend: | $(golangci-lint) ## Run noscan linters
+lint-noscan: | $(golangci-lint) ## Run noscan linters
 	$Q $(golangci-lint) run -v
 
 fmt: $(goimports) ## Format source files
 	$Q $(goimports) -local $(MODULE) -w $$(find . -type f -name '*.go' -not -path "./vendor/*")
 
 clean: clean ## Clean
+	## clean the output
 
 ## Release:
 

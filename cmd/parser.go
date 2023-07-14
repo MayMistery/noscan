@@ -15,6 +15,9 @@ type IPPool struct {
 	ipNet *net.IPNet
 }
 
+// ReadIPAddressesFromFile reads a file that contains a list of IP addresses.
+// Each IP address should be on a separate line.
+// It returns a slice of IP addresses, or an error if something goes wrong.
 func ReadIPAddressesFromFile(filepath string) ([]string, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
@@ -49,6 +52,7 @@ func ReadIPAddressesFromFile(filepath string) ([]string, error) {
 	return ipAddresses, nil
 }
 
+// IPRange calculates and returns the first and last IP address in the provided network.
 func IPRange(ipNet *net.IPNet) (net.IP, net.IP) {
 	start := ipNet.IP
 	mask := ipNet.Mask
@@ -61,6 +65,8 @@ func IPRange(ipNet *net.IPNet) (net.IP, net.IP) {
 	return start, bcst
 }
 
+// InTarget checks if the provided IP address is within any of the IP pools.
+// It returns true if the IP address is within an IP pool, false otherwise.
 func InTarget(ip string) bool {
 	ipParsed := net.ParseIP(ip)
 	for _, ipPool := range IPNetPools {
@@ -71,6 +77,8 @@ func InTarget(ip string) bool {
 	return false
 }
 
+// GetPools takes a list of functions that return an IP address string,
+// and returns a function that calls each function in the list until it gets a non-empty string.
 func GetPools(ipPoolFuncList []func() string) func() string {
 	return func() string {
 		for _, ipPoolFunc := range ipPoolFuncList {
@@ -82,6 +90,7 @@ func GetPools(ipPoolFuncList []func() string) func() string {
 	}
 }
 
+// SetPool sets the network for the IP pool to the provided CIDR block.
 func (ipPool *IPPool) SetPool(cidrIp string) error {
 	_, ipNet, err := net.ParseCIDR(cidrIp)
 	if err != nil {
@@ -92,6 +101,8 @@ func (ipPool *IPPool) SetPool(cidrIp string) error {
 	return nil
 }
 
+// GetPool returns a function that iterates over the IP addresses in the IP pool.
+// Each call to the returned function will return the next IP address in the pool as a string.
 func (ipPool *IPPool) GetPool() func() string {
 	var counter int64 = 0
 	start, end := IPRange(ipPool.ipNet)
@@ -110,6 +121,7 @@ func (ipPool *IPPool) GetPool() func() string {
 	}
 }
 
+// GetPoolSize calculates and returns the number of IP addresses in the IP pool.
 func (ipPool *IPPool) GetPoolSize() int64 {
 	start, end := IPRange(ipPool.ipNet)
 	startIpInt := big.NewInt(0)
@@ -119,6 +131,8 @@ func (ipPool *IPPool) GetPoolSize() int64 {
 	return endIpInt.Int64() - startIpInt.Int64()
 }
 
+// ParsePort returns a slice of ports to scan based on the Ports field of the Config struct.
+// It supports the special values "all" and "common" to scan all ports or a predefined list of common ports.
 func ParsePort() (scanPorts []int) {
 	if Config.Ports == "" {
 		return
@@ -137,6 +151,9 @@ func ParsePort() (scanPorts []int) {
 	}
 }
 
+// parsePortStr takes a string that represents a list of ports or port ranges,
+// and returns a slice of all ports in the list.
+// The string can contain individual ports separated by commas and/or ranges of ports separated by a dash.
 func parsePortStr(inputPorts string) (scanPorts []int) {
 	slices := strings.Split(inputPorts, ",")
 	for _, port := range slices {
@@ -171,6 +188,8 @@ func parsePortStr(inputPorts string) (scanPorts []int) {
 	return scanPorts
 }
 
+// removeDuplicate removes duplicate values from a slice of integers.
+// It returns a new slice that contains only the unique values from the original slice.
 func removeDuplicate(old []int) []int {
 	var result []int
 	temp := map[int]struct{}{}

@@ -73,6 +73,7 @@ func (s *Storage) UpdateCache(ipCache *storage.IpCache) error {
 	return err
 }
 
+// UpdateCacheAsync pushes an UpdateCache action to the DBPool.
 func UpdateCacheAsync(ipCache *storage.IpCache) {
 	DBPool.Push(poolInput{
 		action: "UpdateCache",
@@ -80,6 +81,7 @@ func UpdateCacheAsync(ipCache *storage.IpCache) {
 	})
 }
 
+// UpdateServiceInfo updates the services of a host in the Bolt database.
 func (s *Storage) UpdateServiceInfo(serviceInfoArg *serviceInfoInput) error {
 	host := serviceInfoArg.host
 	port := serviceInfoArg.port
@@ -98,6 +100,7 @@ func (s *Storage) UpdateServiceInfo(serviceInfoArg *serviceInfoInput) error {
 	return s.Ipdb.Update(ipCache)
 }
 
+// UpdateServiceInfoAsync pushes an UpdateServiceInfo action to the DBPool.
 func UpdateServiceInfoAsync(host string, port int, services *cmd.PortInfo) {
 	DBPool.Push(poolInput{
 		action: "UpdateServiceInfo",
@@ -107,6 +110,7 @@ func UpdateServiceInfoAsync(host string, port int, services *cmd.PortInfo) {
 	})
 }
 
+// UpdateDeviceInfo updates the device info of a host in the Bolt database.
 func (s *Storage) UpdateDeviceInfo(deviceInfoArg *deviceInfoInput) error {
 	host := deviceInfoArg.host
 	deviceInfo := deviceInfoArg.deviceInfo
@@ -119,6 +123,7 @@ func (s *Storage) UpdateDeviceInfo(deviceInfoArg *deviceInfoInput) error {
 	return s.UpdateCache(ipCache)
 }
 
+// UpdateDeviceInfoAsync pushes an UpdateDeviceInfo action to the DBPool.
 func UpdateDeviceInfoAsync(host string, deviceInfo string) {
 	DBPool.Push(poolInput{
 		action: "UpdateDeviceInfo",
@@ -128,6 +133,7 @@ func UpdateDeviceInfoAsync(host string, deviceInfo string) {
 	})
 }
 
+// UpdateHoneypot updates the honeypot of a host in the Bolt database.
 func (s *Storage) UpdateHoneypot(deviceInfoArg *honeypotInput) error {
 	host := deviceInfoArg.host
 	honeypot := deviceInfoArg.honeypot
@@ -140,6 +146,7 @@ func (s *Storage) UpdateHoneypot(deviceInfoArg *honeypotInput) error {
 	return s.UpdateCache(ipCache)
 }
 
+// UpdateHoneypotAsync pushes an UpdateHoneypot action to the DBPool.
 func UpdateHoneypotAsync(host string, honeypot []string) {
 	DBPool.Push(poolInput{
 		action: "UpdateHoneypot",
@@ -149,6 +156,8 @@ func UpdateHoneypotAsync(host string, honeypot []string) {
 	})
 }
 
+// InitAsyncDatabase initializes the asynchronous database.
+// It opens a new Bolt database, creates a new DBPool, and starts running the DBPool.
 func InitAsyncDatabase() *sync.WaitGroup {
 	// 创建一个新的存储实例
 	var err error
@@ -196,6 +205,8 @@ type honeypotInput struct {
 	honeypot []string
 }
 
+// NewDBPool creates a new DBPool.
+// It sets the function of the pool to be a function that performs a database action based on the poolInput.
 func NewDBPool() *cmd.Pool {
 	dbPool := cmd.NewPool(cmd.Config.Threads/10 + 1)
 	dbPool.Function = func(input interface{}) {
@@ -237,9 +248,10 @@ func NewDBPool() *cmd.Pool {
 //func HandleDBError(err error) {
 //
 //
-//	//TODO handle db error
+//	//TODO handle db error together
 //}
 
+// SaveBannerCache saves a BannerCache instance to the Bolt database.
 func (s *Storage) SaveBannerCache(bannerCache *storage.BannerCache) error {
 	//s.mu.Lock()
 	//defer s.mu.Unlock()
@@ -251,6 +263,7 @@ func (s *Storage) SaveBannerCache(bannerCache *storage.BannerCache) error {
 	return err
 }
 
+// GetBannerCache retrieves a BannerCache instance from the Bolt database by IP.
 func (s *Storage) GetBannerCache(ip string) (*storage.BannerCache, error) {
 	//s.mu.RLock()
 	//defer s.mu.RUnlock()
@@ -265,6 +278,7 @@ func (s *Storage) GetBannerCache(ip string) (*storage.BannerCache, error) {
 	return &bannerCache, nil
 }
 
+// UpdateBannerCache updates a BannerCache instance in the Bolt database.
 func (s *Storage) UpdateBannerCache(bannerCache *storage.BannerCache) error {
 	//s.mu.Lock()
 	//defer s.mu.Unlock()
@@ -281,6 +295,7 @@ func (s *Storage) UpdateBannerCache(bannerCache *storage.BannerCache) error {
 	return err
 }
 
+// UpdateBannerCacheAsync pushes an UpdateBannerCache action to the DBPool.
 func UpdateBannerCacheAsync(bannerCache *storage.BannerCache) {
 	DBPool.Push(poolInput{
 		action: "UpdateBannerCache",

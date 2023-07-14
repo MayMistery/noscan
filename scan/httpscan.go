@@ -26,6 +26,8 @@ const (
 	NotSupportProtocol = "protocol is not support"
 )
 
+// HttpScanPool creates a new pool for HTTP scanning.
+// It sets the function of the pool to be a function that scans a single HTTP target.
 func HttpScanPool() *cmd.Pool {
 	httpScanPool := cmd.NewPool(cmd.Config.Threads/2 + 1)
 	httpScanPool.Function = func(in interface{}) {
@@ -56,11 +58,14 @@ func HttpScanPool() *cmd.Pool {
 	return httpScanPool
 }
 
+// HttpHandlerError logs and prints an error that occurred during HTTP scanning.
 func HttpHandlerError(url *url.URL, err error) {
 	cmd.ErrLog("URLScanner Error: %s %v", url.String(), err)
 	fmt.Println("URLScanner Error: ", url.String(), err)
 }
 
+// httpRequest sends an HTTP request to the given URL and returns the response.
+// If the request or client is not provided, it creates new ones.
 func httpRequest(URL *url.URL, req *http.Request, cli *http.Client) (*simplehttp.Response, error) {
 	if req == nil {
 		req, _ = simplehttp.NewRequest(http.MethodGet, URL.String(), nil)
@@ -81,6 +86,7 @@ func httpRequest(URL *url.URL, req *http.Request, cli *http.Client) (*simplehttp
 	return resp, nil
 }
 
+// getServiceAppFromAppFinger gets the service application from the app finger and the given response.
 func getServiceAppFromAppFinger(url *url.URL, resp *simplehttp.Response) []string {
 	if appfinger.SupportCheck(url.Scheme) == false || resp == nil {
 		cmd.ErrLog("%s %v", url.Host, errors.New(NotSupportProtocol))
@@ -94,6 +100,7 @@ func getServiceAppFromAppFinger(url *url.URL, resp *simplehttp.Response) []strin
 	return finger.ProductName
 }
 
+// getServiceAppFromWappalyzer gets the service application from the wappalyzer and the given response.
 func getServiceAppFromWappalyzer(resp *http.Response) []string {
 	if resp == nil {
 		return []string{}
@@ -135,10 +142,12 @@ type deviceMapping struct {
 	fingerprints []string
 }
 
+// deviceMapping is a struct to hold information about a device mapping.
+// It includes a device name and a slice of fingerprints.
 var deviceMappings = []deviceMapping{
 	{device: "webcam", fingerprints: []string{"摄像头", "webcam", "camera"}},
 	{device: "router", fingerprints: []string{"路由器", "router"}},
-	{device: "gateway", fingerprints: []string{"网关", "防火墙", "gateway"}},
+	{device: "gateway", fingerprints: []string{"网关", "防火墙", "gateway", "pfsense"}},
 	{device: "vpn", fingerprints: []string{"虚拟专用网络", "vpn"}},
 	{device: "storage", fingerprints: []string{"存储设备", "storage"}},
 	{device: "switch", fingerprints: []string{"交换机", "switch"}},
@@ -152,6 +161,8 @@ var deviceMappings = []deviceMapping{
 	{device: "honeypot", fingerprints: []string{"蜜罐", "honeypot"}},
 }
 
+// HandleAppFingerprint handles the app fingerprint of the given URL.
+// It checks if the fingerprints match any known device types and updates the service, device, and honeypot information accordingly.
 func HandleAppFingerprint(url *url.URL, inputFinger []string) {
 	//遍历ProductName []string
 	var honeyPot, service []string

@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// ErrLog Uniformly output error messages to a log file
 func ErrLog(format string, a ...interface{}) {
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("2006-01-02 15:04:05") + " : "
@@ -34,6 +35,7 @@ func ErrLog(format string, a ...interface{}) {
 	}()
 }
 
+// ResultLog Log successful scan events
 func ResultLog(format string, a ...interface{}) {
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("2006-01-02 15:04:05") + " : "

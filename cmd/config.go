@@ -33,6 +33,7 @@ type Configs struct {
 	DeepInspection bool
 	Debug          bool
 	CIDR           string
+	help           bool
 }
 
 var portList = map[string]int{
