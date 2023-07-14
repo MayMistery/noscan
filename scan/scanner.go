@@ -101,11 +101,11 @@ func StopScanner(wg *sync.WaitGroup) {
 			Scanner.Stop()
 			wg.Done()
 		}
-		if PortScanner.RunningThreads() == 0 && PortScanner.Done == false {
+		if PortScanner.RunningThreads() == 0 && PortScanner.Done == false && Scanner.Done == true {
 			PortScanner.Stop()
 			wg.Done()
 		}
-		if HttpScanner.RunningThreads() == 0 && HttpScanner.Done == false {
+		if HttpScanner.RunningThreads() == 0 && HttpScanner.Done == false && PortScanner.Done == true && Scanner.Done == true {
 			HttpScanner.Stop()
 			wg.Done()
 		}
@@ -130,7 +130,7 @@ func Scan() error {
 }
 
 func ScannerPool() *cmd.Pool {
-	scanPool := cmd.NewPool(cmd.Config.Threads/20 + 1)
+	scanPool := cmd.NewPool(cmd.Config.Threads)
 	scanPool.Function = func(input interface{}) {
 		host := input.(string)
 		if CheckIcmpLive(host) {

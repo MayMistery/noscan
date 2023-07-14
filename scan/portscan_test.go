@@ -12,7 +12,7 @@ import (
 
 func TestPortScan(t *testing.T) {
 	cmd.Config.Threads = 1000
-	cmd.Config.DBFilePath = "../data/database.db"
+	cmd.Config.DBFilePath = "../data/database3.db"
 	cmd.Config.OutputFilepath = "../result/result3.json"
 	cmd.Config.DeepInspection = true
 	cmd.Config.Timeout = 10 * time.Second
@@ -28,7 +28,7 @@ func TestPortScan(t *testing.T) {
 	go HttpScanner.Run()
 
 	for i := 1; i < 65536; i++ {
-		PortScanner.Push(Address{net.ParseIP("211.22.90.156"), i})
+		PortScanner.Push(Address{net.ParseIP("104.248.48.130"), i})
 	}
 	//PortScanner.Push(Address{net.ParseIP("204.168.173.224"), 22})
 	//PortScanner.Push(Address{net.ParseIP("204.168.173.224"), 443})

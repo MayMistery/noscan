@@ -27,7 +27,7 @@ const (
 )
 
 func HttpScanPool() *cmd.Pool {
-	httpScanPool := cmd.NewPool(cmd.Config.Threads)
+	httpScanPool := cmd.NewPool(cmd.Config.Threads/2 + 1)
 	httpScanPool.Function = func(in interface{}) {
 		value := in.(HttpTarget)
 		URL := value.URL
@@ -36,7 +36,7 @@ func HttpScanPool() *cmd.Pool {
 
 		resp, err := httpRequest(URL, req, cli)
 		var serviceApp []string
-		if err != nil && resp != nil {
+		if err == nil && resp != nil {
 			serviceApp1 := getServiceAppFromAppFinger(URL, resp)
 			serviceApp2 := getServiceAppFromWappalyzer(resp.Response)
 			serviceApp = append(serviceApp1, serviceApp2...)
@@ -70,6 +70,7 @@ func httpRequest(URL *url.URL, req *http.Request, cli *http.Client) (*simplehttp
 
 	if cli == nil {
 		cli = simplehttp.NewClient()
+		simplehttp.SetTimeout(cli, cmd.Config.Timeout)
 	}
 
 	resp, err := simplehttp.Do(cli, req)
