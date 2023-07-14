@@ -15,7 +15,7 @@ var (
 
 type Storage struct {
 	Ipdb *storm.DB
-	mu   sync.RWMutex
+	//mu   sync.RWMutex
 }
 
 func NewStorage(path string) (*Storage, error) {
@@ -33,8 +33,8 @@ func (s *Storage) Close() error {
 }
 
 func (s *Storage) SaveIpCache(ipCache *storage.IpCache) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	//s.mu.Lock()
+	//defer s.mu.Unlock()
 
 	err := s.Ipdb.Save(ipCache)
 	if err != nil {
@@ -44,8 +44,8 @@ func (s *Storage) SaveIpCache(ipCache *storage.IpCache) error {
 }
 
 func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	//s.mu.RLock()
+	//defer s.mu.RUnlock()
 
 	var ipCache storage.IpCache
 	err := s.Ipdb.One("Ip", ip, &ipCache)
@@ -58,8 +58,8 @@ func (s *Storage) GetIpCache(ip string) (*storage.IpCache, error) {
 }
 
 func (s *Storage) UpdateCache(ipCache *storage.IpCache) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	//s.mu.Lock()
+	//defer s.mu.Unlock()
 
 	if _, err := s.GetIpCache(ipCache.Ip); err != nil {
 		return s.SaveIpCache(ipCache)
@@ -241,8 +241,8 @@ func NewDBPool() *cmd.Pool {
 //}
 
 func (s *Storage) SaveBannerCache(bannerCache *storage.BannerCache) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	//s.mu.Lock()
+	//defer s.mu.Unlock()
 
 	err := s.Ipdb.Save(bannerCache)
 	if err != nil {
@@ -252,8 +252,8 @@ func (s *Storage) SaveBannerCache(bannerCache *storage.BannerCache) error {
 }
 
 func (s *Storage) GetBannerCache(ip string) (*storage.BannerCache, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	//s.mu.RLock()
+	//defer s.mu.RUnlock()
 
 	var bannerCache storage.BannerCache
 	err := s.Ipdb.One("Ip", ip, &bannerCache)
@@ -266,8 +266,8 @@ func (s *Storage) GetBannerCache(ip string) (*storage.BannerCache, error) {
 }
 
 func (s *Storage) UpdateBannerCache(bannerCache *storage.BannerCache) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	//s.mu.Lock()
+	//defer s.mu.Unlock()
 
 	if _, err := s.GetBannerCache(bannerCache.Ip); err != nil {
 		return s.SaveBannerCache(bannerCache)

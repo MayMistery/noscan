@@ -40,6 +40,7 @@ func Flag(config *Configs) {
 	flag.IntVar(&config.Threads, "thread", 1000, "threads num")
 	flag.IntVar(&timeout, "timeout", 3, "connect time out")
 	flag.BoolVar(&config.DeepInspection, "simple", true, "close deep identify")
+	flag.BoolVar(&config.Debug, "debug", false, "open go pprof")
 
 	config.Timeout = time.Duration(timeout) * time.Second
 	// TODO to add flags and corresponding var

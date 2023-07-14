@@ -31,6 +31,7 @@ type Configs struct {
 	Threads        int
 	Timeout        time.Duration
 	DeepInspection bool
+	Debug          bool
 }
 
 var portList = map[string]int{

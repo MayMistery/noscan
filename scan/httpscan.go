@@ -35,13 +35,19 @@ func HttpScanPool() *cmd.Pool {
 		cli := value.client
 
 		resp, err := httpRequest(URL, req, cli)
-		serviceApp1 := getServiceAppFromAppFinger(URL, resp)
-		serviceApp2 := getServiceAppFromWappalyzer(resp.Response)
+		var serviceApp []string
+		if err != nil && resp != nil {
+			serviceApp1 := getServiceAppFromAppFinger(URL, resp)
+			serviceApp2 := getServiceAppFromWappalyzer(resp.Response)
+			serviceApp = append(serviceApp1, serviceApp2...)
+		} else {
+			serviceApp = []string{}
+		}
 		if err != nil {
 			HttpHandlerError(URL, err)
 			return
 		}
-		serviceApp := append(serviceApp1, serviceApp2...)
+
 		if len(serviceApp) > 0 {
 			HandleAppFingerprint(URL, serviceApp)
 		}
@@ -75,7 +81,7 @@ func httpRequest(URL *url.URL, req *http.Request, cli *http.Client) (*simplehttp
 }
 
 func getServiceAppFromAppFinger(url *url.URL, resp *simplehttp.Response) []string {
-	if appfinger.SupportCheck(url.Scheme) == false {
+	if appfinger.SupportCheck(url.Scheme) == false || resp == nil {
 		cmd.ErrLog("%s %v", url.Host, errors.New(NotSupportProtocol))
 		fmt.Println(url, errors.New(NotSupportProtocol))
 		return []string{}
@@ -88,6 +94,10 @@ func getServiceAppFromAppFinger(url *url.URL, resp *simplehttp.Response) []strin
 }
 
 func getServiceAppFromWappalyzer(resp *http.Response) []string {
+	if resp == nil {
+		return []string{}
+	}
+
 	data, _ := io.ReadAll(resp.Body) // Ignoring error for example
 
 	var serviceApp []string

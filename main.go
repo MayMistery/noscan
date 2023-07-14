@@ -23,6 +23,9 @@ import (
 	"github.com/MayMistery/noscan/scan"
 	"github.com/MayMistery/noscan/storage/bolt"
 	"github.com/MayMistery/noscan/utils"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"time"
 )
@@ -39,6 +42,12 @@ func Exec() {
 	cmd.Flag(&cmd.Config)
 	dbWaitGroup := bolt.InitAsyncDatabase()
 	utils.InitResultMap()
+
+	if cmd.Config.Debug {
+		go func() {
+			log.Println(http.ListenAndServe(":38899", nil))
+		}()
+	}
 
 	fs, _ := os.Open(cmd.Config.RulesFilePath)
 	if n, err := appfinger.InitDatabaseFS(fs); err != nil {
