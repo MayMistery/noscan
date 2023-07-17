@@ -1,6 +1,6 @@
 package scanlib
 
-var nmapServiceProbesOLD = `
+var nmapServiceProbesOld = `
 # Nmap service detection probe list -*- mode: fundamental; -*-
 # $Id$
 #

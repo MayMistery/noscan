@@ -8,8 +8,8 @@ import (
 
 func TestScan(t *testing.T) {
 	var scanner = New()
-	host := "104.248.48.130"
-	port := 8880
+	host := "137.184.166.61"
+	port := 5672
 	scanner.OpenDeepIdentify()
 	status, response := scanner.ScanTimeout(host, port, time.Second*30)
 	if response != nil {

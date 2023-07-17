@@ -26,7 +26,8 @@ func tcpSend(protocol string, netloc string, data string, duration time.Duration
 	var tmp = make([]byte, 256) // using small tmo buffer for demonstrating
 	var length int
 	for {
-		_ = conn.SetReadDeadline(time.Now().Add(time.Second * 3))
+		//_ = conn.SetReadDeadline(time.Now().Add(time.Second * 3))
+		_ = conn.SetReadDeadline(time.Now().Add(duration))
 		// TODO confirm the exact timeout
 		length, err = conn.Read(tmp)
 		buf = append(buf, tmp[:length]...)

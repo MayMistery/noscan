@@ -11,11 +11,11 @@ import (
 )
 
 func TestPortScan(t *testing.T) {
-	cmd.Config.Threads = 1000
+	cmd.Config.Threads = 2000
 	cmd.Config.DBFilePath = "../data/database3.db"
 	cmd.Config.OutputFilepath = "../result/result3.json"
 	cmd.Config.DeepInspection = true
-	cmd.Config.Timeout = 10 * time.Second
+	cmd.Config.Timeout = 40 * time.Second
 	bolt.InitAsyncDatabase()
 	utils.InitResultMap()
 
@@ -28,7 +28,7 @@ func TestPortScan(t *testing.T) {
 	go HttpScanner.Run()
 
 	for i := 1; i < 65536; i++ {
-		PortScanner.Push(Address{net.ParseIP("104.248.48.130"), i})
+		PortScanner.Push(Address{net.ParseIP("103.252.118.203"), i})
 	}
 	//PortScanner.Push(Address{net.ParseIP("204.168.173.224"), 22})
 	//PortScanner.Push(Address{net.ParseIP("204.168.173.224"), 443})
@@ -36,7 +36,7 @@ func TestPortScan(t *testing.T) {
 
 	go func() {
 		for {
-			time.Sleep(time.Second * 40)
+			time.Sleep(cmd.Config.Timeout * 2)
 			if PortScanner.RunningThreads() == 0 && PortScanner.Done == false {
 				PortScanner.Stop()
 				wg.Done()
@@ -48,4 +48,5 @@ func TestPortScan(t *testing.T) {
 		}
 	}()
 	wg.Wait()
+	utils.OutputResultMap()
 }

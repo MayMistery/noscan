@@ -11,6 +11,7 @@ require (
 	github.com/projectdiscovery/wappalyzergo v0.0.104
 	github.com/stretchr/testify v1.8.4
 	github.com/twmb/murmur3 v1.1.6
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 )
 
 require (

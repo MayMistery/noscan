@@ -21,7 +21,7 @@ noscan version: ` + version.Version + `
 
 func Flag(config *Configs) {
 	_, ex, _, _ := runtime.Caller(0)
-	exPath := path.Join(filepath.Dir(ex), "..")
+	exPath := filepath.Dir(filepath.Dir(ex))
 	var timeout int
 
 	Banner()

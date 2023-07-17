@@ -57,7 +57,7 @@ func PortHandlerOpen(value Address) {
 func PortHandlerNotMatched(value Address, response *scanlib.Response) {
 	portInfo := &cmd.PortInfo{
 		Port:     value.Port,
-		Protocol: "unknow",
+		Protocol: "unknown",
 	}
 	utils.AddPortInfo(value.IP.String(), portInfo)
 }
