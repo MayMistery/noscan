@@ -29,4 +29,4 @@ COPY --from=builder /app/result/ /app/result/
 COPY --from=builder /app/data/fingerprint.txt /app/data/fingerprint.txt
 COPY --from=builder /app/data/target /app/data/target
 
-CMD ["./noname"]
+#ENTRYPOINT ["./noname"]

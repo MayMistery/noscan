@@ -61,7 +61,8 @@ func HttpScanPool() *cmd.Pool {
 // HttpHandlerError logs and prints an error that occurred during HTTP scanning.
 func HttpHandlerError(url *url.URL, err error) {
 	cmd.ErrLog("URLScanner Error: %s %v", url.String(), err)
-	fmt.Println("URLScanner Error: ", url.String(), err)
+	//TODO
+	//fmt.Println("URLScanner Error: ", url.String(), err)
 }
 
 // httpRequest sends an HTTP request to the given URL and returns the response.

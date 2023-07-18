@@ -203,7 +203,8 @@ func (n *Nmap) getFinger(responseRaw string, tls bool, requestName string) *Fing
 	fallback := n.probeNameMap[requestName].fallback
 	fallbackProbe := n.probeNameMap[fallback]
 	for fallback != "" {
-		logger.Println(requestName, " fallback is :", fallback)
+		//TODO
+		//logger.Println(requestName, " fallback is :", fallback)
 		finger = fallbackProbe.match(data)
 		fallback = n.probeNameMap[fallback].fallback
 		if finger.Service != "" {

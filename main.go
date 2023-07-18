@@ -27,6 +27,8 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -38,6 +40,7 @@ func main() {
 }
 
 func Exec() {
+	handleSIGINT()
 
 	cmd.Flag(&cmd.Config)
 	dbWaitGroup := bolt.InitAsyncDatabase()
@@ -60,16 +63,45 @@ func Exec() {
 	if n, err := appfinger.InitDatabaseFS(fs); err != nil {
 		fmt.Println("[-]指纹库加载失败，请检查【fingerprint.txt】文件", err)
 	} else {
-		fmt.Printf("[+]成功加载HTTP指纹:[%d]条", n)
+		fmt.Printf("[+]成功加载HTTP指纹:[%d]条\n", n)
 	}
 
 	// start scanning
+	fmt.Println("[+]Start Scan, default output to /app/result/")
 	err := scan.Scan()
 	if err != nil {
 		fmt.Println("[-]Scan error", err)
 	}
 
 	// output result
+	handleOutput()
+
+	fmt.Println("[+]Bye")
+}
+
+func handleSIGINT() {
+	// 创建一个通道来接收信号
+	sigs := make(chan os.Signal, 1)
+
+	// 注册需要捕获的信号
+	signal.Notify(sigs, syscall.SIGINT)
+
+	go func() {
+		// 阻塞直到信号被接收到
+		sig := <-sigs
+		fmt.Println(sig)
+		fmt.Println("You pressed ctrl+C, Please have a wait.")
+		fmt.Println("Press again to force quit")
+
+		//TODO gracefully exit
+		handleOutput()
+
+		fmt.Println("[+]Bye (interrupted)")
+		os.Exit(0)
+	}()
+}
+
+func handleOutput() {
 	if cmd.Config.JsonOutput {
 		utils.OutputResultMap()
 	} else {
