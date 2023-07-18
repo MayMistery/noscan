@@ -32,6 +32,7 @@ import (
 	"time"
 )
 
+// export GODEBUG=detectdeadlocks=1
 func main() {
 	start := time.Now()
 	Exec()

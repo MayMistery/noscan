@@ -62,7 +62,7 @@ func (p *Pool) Push(i interface{}) {
 	p.in <- i
 }
 
-// 结束整个工作
+// Stop 结束整个工作
 func (p *Pool) Stop() {
 	if p.Done != true {
 		close(p.in)
@@ -70,7 +70,7 @@ func (p *Pool) Stop() {
 	p.Done = true
 }
 
-// 执行工作池当中的任务
+// Run 执行工作池当中的任务
 func (p *Pool) Run() {
 	p.Done = false
 	//只启动有限大小的协程，协程的数量不可以超过工作池设定的数量，防止计算资源崩溃

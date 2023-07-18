@@ -16,10 +16,36 @@ import (
 	"time"
 )
 
+type ScanRequest struct {
+	Addr Address
+	Res  chan bool
+}
+
 var (
 	secondChance         = make(map[string]map[int]struct{})
 	secondChanceMapMutex = sync.RWMutex{}
+	scanRequests         = make(chan ScanRequest)
 )
+
+func init() {
+	go func() {
+		for req := range scanRequests {
+			secondChanceMapMutex.Lock()
+			_, isSet := secondChance[req.Addr.IP.String()]
+			if !isSet {
+				secondChance[req.Addr.IP.String()] = make(map[int]struct{})
+			}
+			_, isScan := secondChance[req.Addr.IP.String()][req.Addr.Port]
+			if !isScan {
+				secondChance[req.Addr.IP.String()][req.Addr.Port] = struct{}{}
+				req.Res <- true
+			} else {
+				req.Res <- false
+			}
+			secondChanceMapMutex.Unlock()
+		}
+	}()
+}
 
 // PortScanPool creates a new pool for port scanning.
 // It sets the function of the pool to be a function that scans a single port.
@@ -36,18 +62,27 @@ func PortScanPool() *cmd.Pool {
 		switch status {
 		case scanlib.Closed:
 			//If closed scan twice
-			secondChanceMapMutex.Lock()
-			_, isSet := secondChance[value.IP.String()]
-			if !isSet {
-				secondChance[value.IP.String()] = make(map[int]struct{})
+			//secondChanceMapMutex.Lock()
+			//_, isSet := secondChance[value.IP.String()]
+			//if !isSet {
+			//	secondChance[value.IP.String()] = make(map[int]struct{})
+			//}
+			//_, isScan := secondChance[value.IP.String()][value.Port]
+			//if !isScan {
+			//	PortScanner.Push(value)
+			//	secondChance[value.IP.String()][value.Port] = struct{}{}
+			//}
+			//secondChanceMapMutex.Unlock()
+			res := make(chan bool)
+			scanRequests <- ScanRequest{Addr: value, Res: res}
+			select {
+			case retry := <-res:
+				if retry {
+					PortScanner.Push(value)
+				}
+			case <-time.After(time.Second * 2):
+				break
 			}
-			_, isScan := secondChance[value.IP.String()][value.Port]
-			if !isScan {
-				PortScanner.Push(value)
-				secondChance[value.IP.String()][value.Port] = struct{}{}
-			}
-			secondChanceMapMutex.Unlock()
-
 		case scanlib.Open:
 			PortHandlerOpen(value)
 		case scanlib.NotMatched:
