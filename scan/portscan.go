@@ -36,24 +36,17 @@ func PortScanPool() *cmd.Pool {
 		switch status {
 		case scanlib.Closed:
 			//If closed scan twice
-			secondChanceMapMutex.RLock()
+			secondChanceMapMutex.Lock()
 			_, isSet := secondChance[value.IP.String()]
-			secondChanceMapMutex.RUnlock()
 			if !isSet {
-				secondChanceMapMutex.Lock()
 				secondChance[value.IP.String()] = make(map[int]struct{})
-				secondChanceMapMutex.Unlock()
-			} else {
-				secondChanceMapMutex.RLock()
-				_, isScan := secondChance[value.IP.String()][value.Port]
-				secondChanceMapMutex.RUnlock()
-				if !isScan {
-					PortScanner.Push(value)
-					secondChanceMapMutex.Lock()
-					secondChance[value.IP.String()][value.Port] = struct{}{}
-					secondChanceMapMutex.Unlock()
-				}
 			}
+			_, isScan := secondChance[value.IP.String()][value.Port]
+			if !isScan {
+				PortScanner.Push(value)
+				secondChance[value.IP.String()][value.Port] = struct{}{}
+			}
+			secondChanceMapMutex.Unlock()
 
 		case scanlib.Open:
 			PortHandlerOpen(value)
