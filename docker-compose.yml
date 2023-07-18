@@ -1,0 +1,10 @@
+version: '3'
+services:
+  noscan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./result:/app/result
+      - ./data:/app/data
+    restart: always
