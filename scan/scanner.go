@@ -160,7 +160,8 @@ func CheckIcmpLive(host string) bool {
 }
 
 func CheckCommonPort(host string) bool {
-	var commonPorts = []int{22, 23, 80, 139, 512, 443, 445, 3389}
+	//var commonPorts = []int{22, 23, 80, 139, 512, 443, 445, 3389}
+	var commonPorts = cmd.Ports
 	for _, port := range commonPorts {
 		addr := fmt.Sprintf("%s:%d", host, port)
 		_, err := simplenet.Send("tcp", false, addr, "\r\n", cmd.Config.Timeout, 128)

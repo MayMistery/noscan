@@ -12,7 +12,13 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
+)
+
+var (
+	secondChance         = make(map[string]map[int]struct{})
+	secondChanceMapMutex = sync.RWMutex{}
 )
 
 // PortScanPool creates a new pool for port scanning.
@@ -28,6 +34,27 @@ func PortScanPool() *cmd.Pool {
 		value := in.(Address)
 		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, cmd.Config.Timeout)
 		switch status {
+		case scanlib.Closed:
+			//If closed scan twice
+			secondChanceMapMutex.RLock()
+			_, isSet := secondChance[value.IP.String()]
+			secondChanceMapMutex.RUnlock()
+			if !isSet {
+				secondChanceMapMutex.Lock()
+				secondChance[value.IP.String()] = make(map[int]struct{})
+				secondChanceMapMutex.Unlock()
+			} else {
+				secondChanceMapMutex.RLock()
+				_, isScan := secondChance[value.IP.String()][value.Port]
+				secondChanceMapMutex.RUnlock()
+				if !isScan {
+					PortScanner.Push(value)
+					secondChanceMapMutex.Lock()
+					secondChance[value.IP.String()][value.Port] = struct{}{}
+					secondChanceMapMutex.Unlock()
+				}
+			}
+
 		case scanlib.Open:
 			PortHandlerOpen(value)
 		case scanlib.NotMatched:
