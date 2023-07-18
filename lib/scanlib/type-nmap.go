@@ -29,10 +29,14 @@ type Nmap struct {
 
 //扫描类
 
-func (n *Nmap) ScanTimeout(ip string, port int, timeout time.Duration) (status Status, response *Response) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	var resChan = make(chan bool)
+type ScanResult struct {
+	Status   Status
+	Response *Response
+}
 
+func (n *Nmap) ScanTimeout(ip string, port int, timeout time.Duration) (Status, *Response) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	resChan := make(chan ScanResult, 1)
 	defer func() {
 		close(resChan)
 		cancel()
@@ -46,15 +50,15 @@ func (n *Nmap) ScanTimeout(ip string, port int, timeout time.Duration) (status S
 				}
 			}
 		}()
-		status, response = n.Scan(ip, port)
-		resChan <- true
+		status, response := n.Scan(ip, port)
+		resChan <- ScanResult{status, response}
 	}()
 
 	select {
 	case <-ctx.Done():
 		return Closed, nil
-	case <-resChan:
-		return status, response
+	case res := <-resChan:
+		return res.Status, res.Response
 	}
 }
 
