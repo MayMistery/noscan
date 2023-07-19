@@ -16,11 +16,6 @@ import (
 	"time"
 )
 
-//type ScanRequest struct {
-//	Addr Address
-//	Res  chan bool
-//}
-
 var (
 	secondChance          = make(map[string]map[int]struct{})
 	secondChanceMapMutex  = sync.RWMutex{}
@@ -46,7 +41,7 @@ func PortScanPool() *cmd.Pool {
 			nmap.OpenDeepIdentify()
 		}
 		value := in.(Address)
-		fmt.Println("[+]Scanning", value.IP.String(), value.Port)
+		//fmt.Println("[+]Scanning", value.IP.String(), value.Port)
 		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, cmd.Config.Timeout)
 		switch status {
 		case scanlib.Closed:
@@ -55,7 +50,9 @@ func PortScanPool() *cmd.Pool {
 			_, isSet := secondChance[value.IP.String()]
 			secondChanceMapMutex.RUnlock()
 			if !isSet {
+				secondChanceMapMutex.Lock()
 				secondChance[value.IP.String()] = make(map[int]struct{})
+				secondChanceMapMutex.Unlock()
 			}
 			secondChanceMapMutex.RLock()
 			_, isScan := secondChance[value.IP.String()][value.Port]
@@ -115,7 +112,7 @@ func PortHandlerMatched(value Address, response *scanlib.Response) {
 		Protocol:   protocol,
 		ServiceApp: services,
 	}
-
+	fmt.Println("[+]Get service:", value.IP.String(), value.Port, response.FingerPrint.Service, ":", response.FingerPrint.ProductName)
 	utils.AddPortInfo(value.IP.String(), portInfo)
 	bolt.UpdateBannerCacheAsync(&storage.BannerCache{Ip: value.IP.String(), Port: value.Port, Banner: response.Raw})
 	URLRaw := fmt.Sprintf("%s://%s:%d", protocol, value.IP.String(), value.Port)

@@ -21,6 +21,23 @@ func SetLogger(log Logger) {
 	logger = log
 }
 
+type Worker struct {
+	f func(interface{})
+}
+
+// 通过NewTask来创建一个worker
+func generateWorker(f func(interface{})) *Worker {
+	return &Worker{
+		f: func(in interface{}) {
+			f(in)
+		},
+	}
+}
+
+func (t *Worker) run(in interface{}) {
+	t.f(in)
+}
+
 var poolDoneVarMutex = sync.RWMutex{}
 
 // 池
@@ -120,7 +137,10 @@ func (p *Pool) work() {
 		//压入工作任务到工作清单
 		p.JobsList.Store(Tick, param)
 		//开始工作，输出工作结果
-		p.Function(param)
+		//p.Function(param)
+		f := generateWorker(p.Function)
+		//开始工作，输出工作结果
+		f.run(param)
 		//工作结束，删除工作清单
 		p.JobsList.Delete(Tick)
 		atomic.AddInt32(&p.length, -1)
