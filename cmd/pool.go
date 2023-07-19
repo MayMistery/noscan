@@ -21,6 +21,8 @@ func SetLogger(log Logger) {
 	logger = log
 }
 
+var poolDoneVarMutex = sync.RWMutex{}
+
 // 池
 type Pool struct {
 	//母版函数
@@ -56,7 +58,10 @@ func NewPool(threads int) *Pool {
 
 // 结束整个工作
 func (p *Pool) Push(i interface{}) {
-	if p.Done {
+	poolDoneVarMutex.RLock()
+	done := p.Done
+	poolDoneVarMutex.RUnlock()
+	if done {
 		return
 	}
 	p.in <- i
@@ -64,15 +69,22 @@ func (p *Pool) Push(i interface{}) {
 
 // Stop 结束整个工作
 func (p *Pool) Stop() {
-	if p.Done != true {
+	poolDoneVarMutex.RLock()
+	done := p.Done
+	poolDoneVarMutex.RUnlock()
+	if done != true {
 		close(p.in)
 	}
+	poolDoneVarMutex.Lock()
 	p.Done = true
+	poolDoneVarMutex.Unlock()
 }
 
 // Run 执行工作池当中的任务
 func (p *Pool) Run() {
+	poolDoneVarMutex.Lock()
 	p.Done = false
+	poolDoneVarMutex.Unlock()
 	//只启动有限大小的协程，协程的数量不可以超过工作池设定的数量，防止计算资源崩溃
 	for i := 0; i < p.threads; i++ {
 		p.wg.Add(1)

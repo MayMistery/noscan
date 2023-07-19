@@ -16,33 +16,21 @@ import (
 	"time"
 )
 
-type ScanRequest struct {
-	Addr Address
-	Res  chan bool
-}
+//type ScanRequest struct {
+//	Addr Address
+//	Res  chan bool
+//}
 
 var (
-	secondChance         = make(map[string]map[int]struct{})
-	secondChanceMapMutex = sync.RWMutex{}
-	scanRequests         = make(chan ScanRequest)
+	secondChance          = make(map[string]map[int]struct{})
+	secondChanceMapMutex  = sync.RWMutex{}
+	secondScanAddressChan = make(chan Address)
 )
 
 func init() {
 	go func() {
-		for req := range scanRequests {
-			secondChanceMapMutex.Lock()
-			_, isSet := secondChance[req.Addr.IP.String()]
-			if !isSet {
-				secondChance[req.Addr.IP.String()] = make(map[int]struct{})
-			}
-			_, isScan := secondChance[req.Addr.IP.String()][req.Addr.Port]
-			if !isScan {
-				secondChance[req.Addr.IP.String()][req.Addr.Port] = struct{}{}
-				req.Res <- true
-			} else {
-				req.Res <- false
-			}
-			secondChanceMapMutex.Unlock()
+		for addr := range secondScanAddressChan {
+			PortScanner.Push(addr)
 		}
 	}()
 }
@@ -58,30 +46,24 @@ func PortScanPool() *cmd.Pool {
 			nmap.OpenDeepIdentify()
 		}
 		value := in.(Address)
+		//fmt.Println("[+]Scanning", value.IP.String(), value.Port)
 		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, cmd.Config.Timeout)
 		switch status {
 		case scanlib.Closed:
-			//If closed scan twice
-			//secondChanceMapMutex.Lock()
-			//_, isSet := secondChance[value.IP.String()]
-			//if !isSet {
-			//	secondChance[value.IP.String()] = make(map[int]struct{})
-			//}
-			//_, isScan := secondChance[value.IP.String()][value.Port]
-			//if !isScan {
-			//	PortScanner.Push(value)
-			//	secondChance[value.IP.String()][value.Port] = struct{}{}
-			//}
-			//secondChanceMapMutex.Unlock()
-			res := make(chan bool)
-			scanRequests <- ScanRequest{Addr: value, Res: res}
-			select {
-			case retry := <-res:
-				if retry {
-					PortScanner.Push(value)
-				}
-			case <-time.After(time.Second * 2):
-				break
+			// If closed scan twice
+			secondChanceMapMutex.RLock()
+			_, isSet := secondChance[value.IP.String()]
+			secondChanceMapMutex.RUnlock()
+			if !isSet {
+				secondChance[value.IP.String()] = make(map[int]struct{})
+			}
+			_, isScan := secondChance[value.IP.String()][value.Port]
+			if !isScan {
+				//fmt.Println("[*]Second scan", value.IP.String(), value.Port)
+				secondScanAddressChan <- value
+				secondChanceMapMutex.Lock()
+				secondChance[value.IP.String()][value.Port] = struct{}{}
+				secondChanceMapMutex.Unlock()
 			}
 		case scanlib.Open:
 			PortHandlerOpen(value)
