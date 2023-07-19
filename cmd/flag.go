@@ -26,8 +26,6 @@ func Flag(config *Configs) {
 	var timeout int
 
 	Banner()
-	//flag.StringVar(&, "h", "", "IP address of the host you want to scan,for example: 192.168.11.11 | 192.168.11.11-255 | 192.168.11.11,192.168.11.12")
-	//flag.Int64Var(&Timeout, "time", 3, "Set timeout")
 	flag.StringVar(&config.CIDR, "CIDR", "default", "multi CIDR to scan, split by \",\"")
 	flag.StringVar(&config.Ports, "port", "common", "Ports to scan, choices: all | common | <port>[-<port>][,<ports>]")
 	flag.BoolVar(&config.JsonOutput, "json", true, "using json output")

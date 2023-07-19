@@ -125,13 +125,6 @@ func (n *Nmap) getResponseByProbes(host string, port int, timeout time.Duration,
 		p := n.probeNameMap[requestName]
 
 		status, response = n.getResponse(host, port, p.sslports.exist(port), timeout, p)
-		//如果端口未开放，则等待10s后重新连接
-		//if b.status == Closed {
-		//	time.Sleep(time.Second * 10)
-		//	b.Load(n.getResponse(host, port, n.probeNameMap[requestName]))
-		//}
-
-		//logger.Printf("Target:%s:%d,Probe:%s,Status:%v", host, port, requestName, status)
 
 		if status == Closed || status == Matched {
 			responseNotMatch = nil

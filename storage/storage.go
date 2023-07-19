@@ -2,11 +2,6 @@ package storage
 
 import "github.com/MayMistery/noscan/cmd"
 
-//type PortInfoStore struct {
-//	*cmd.PortInfo
-//	Banner *lib.Response
-//}
-
 type IpCache struct {
 	Ip         string `storm:"id,increment"`
 	DeviceInfo string

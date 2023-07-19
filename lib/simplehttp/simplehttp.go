@@ -58,13 +58,6 @@ var DefaultTransport http.RoundTripper = &http.Transport{
 	DisableKeepAlives: true,
 }
 
-//func NewClient() *http.Client {
-//	client := http.DefaultClient
-//	client.Timeout = 5 * time.Second
-//	client.Transport = DefaultTransport
-//	return client
-//}
-
 func NewClient() *http.Client {
 	return &http.Client{
 		Timeout:   5 * time.Second,

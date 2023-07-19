@@ -12,23 +12,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 )
-
-var (
-	secondChance          = make(map[string]map[int]struct{})
-	secondChanceMapMutex  = sync.RWMutex{}
-	secondScanAddressChan = make(chan Address)
-)
-
-func init() {
-	go func() {
-		for addr := range secondScanAddressChan {
-			PortScanner.Push(addr)
-		}
-	}()
-}
 
 // PortScanPool creates a new pool for port scanning.
 // It sets the function of the pool to be a function that scans a single port.
@@ -44,26 +29,6 @@ func PortScanPool() *cmd.Pool {
 		//fmt.Println("[+]Scanning", value.IP.String(), value.Port)
 		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, cmd.Config.Timeout)
 		switch status {
-		case scanlib.Closed:
-			// If closed scan twice
-			secondChanceMapMutex.RLock()
-			_, isSet := secondChance[value.IP.String()]
-			secondChanceMapMutex.RUnlock()
-			if !isSet {
-				secondChanceMapMutex.Lock()
-				secondChance[value.IP.String()] = make(map[int]struct{})
-				secondChanceMapMutex.Unlock()
-			}
-			secondChanceMapMutex.RLock()
-			_, isScan := secondChance[value.IP.String()][value.Port]
-			secondChanceMapMutex.RUnlock()
-			if !isScan {
-				//fmt.Println("[*]Second scan", value.IP.String(), value.Port)
-				secondScanAddressChan <- value
-				secondChanceMapMutex.Lock()
-				secondChance[value.IP.String()][value.Port] = struct{}{}
-				secondChanceMapMutex.Unlock()
-			}
 		case scanlib.Open:
 			PortHandlerOpen(value)
 		case scanlib.NotMatched:

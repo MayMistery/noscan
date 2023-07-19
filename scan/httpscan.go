@@ -122,22 +122,6 @@ func getServiceAppFromWappalyzer(resp *http.Response) []string {
 	return serviceApp
 }
 
-//webcam : "摄像头" "webcam" "camera"
-//router : "路由器" "router"
-//gateway : "网关" "防火墙" "gateway"
-//vpn : "虚拟专用网络" "vpn"
-//storage : "存储设备" "storage"
-//switch : "交换机" "switch"
-//printers : "打印机设备" "printers"
-//proxy server : "代理服务器" "proxy"
-//kvm : "虚拟化平台" "kvm"
-//cdn : "内容分发平台" "CloudFlare" "cdn"
-//phone : "移动通信" "phone"
-//bridge : "虚拟网络设备" "bridge"
-//security : "安全防护设备" "security"
-//honeypot : "蜜罐" "honeypot"
-//other :
-
 type deviceMapping struct {
 	device       string
 	fingerprints []string

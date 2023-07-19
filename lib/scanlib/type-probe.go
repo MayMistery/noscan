@@ -144,15 +144,6 @@ func (p *probe) loadProbe(s string) {
 }
 
 func (p *probe) loadMatch(s string, soft bool) {
-	//"match": misc.MakeRegexpCompile("^([a-zA-Z0-9-_./]+) m\\|([^|]+)\\|([is]{0,2}) (.*)$"),
-	//match <Service> <pattern>|<patternopt> [<versioninfo>]
-	//	"matchVersioninfoProductname": misc.MakeRegexpCompile("p/([^/]+)/"),
-	//	"matchVersioninfoVersion":     misc.MakeRegexpCompile("v/([^/]+)/"),
-	//	"matchVersioninfoInfo":        misc.MakeRegexpCompile("i/([^/]+)/"),
-	//	"matchVersioninfoHostname":    misc.MakeRegexpCompile("h/([^/]+)/"),
-	//	"matchVersioninfoOS":          misc.MakeRegexpCompile("o/([^/]+)/"),
-	//	"matchVersioninfoDevice":      misc.MakeRegexpCompile("d/([^/]+)/"),
-
 	p.matchGroup = append(p.matchGroup, parseMatch(s, soft))
 }
 

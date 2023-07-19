@@ -11,10 +11,4 @@ type FingerPrint struct {
 	Hostname        string
 	OperatingSystem string
 	DeviceType      string
-	//  p/vendorproductname/
-	//	v/version/
-	//	i/info/
-	//	h/hostname/
-	//	o/operatingsystem/
-	//	d/devicetype/
 }

@@ -21,7 +21,7 @@ go.sum
 *.out
 result
 res.*
-#database.db
+*.db
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
