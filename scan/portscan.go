@@ -46,7 +46,7 @@ func PortScanPool() *cmd.Pool {
 			nmap.OpenDeepIdentify()
 		}
 		value := in.(Address)
-		//fmt.Println("[+]Scanning", value.IP.String(), value.Port)
+		fmt.Println("[+]Scanning", value.IP.String(), value.Port)
 		status, response := nmap.ScanTimeout(value.IP.String(), value.Port, cmd.Config.Timeout)
 		switch status {
 		case scanlib.Closed:
@@ -57,7 +57,9 @@ func PortScanPool() *cmd.Pool {
 			if !isSet {
 				secondChance[value.IP.String()] = make(map[int]struct{})
 			}
+			secondChanceMapMutex.RLock()
 			_, isScan := secondChance[value.IP.String()][value.Port]
+			secondChanceMapMutex.RUnlock()
 			if !isScan {
 				//fmt.Println("[*]Second scan", value.IP.String(), value.Port)
 				secondScanAddressChan <- value
