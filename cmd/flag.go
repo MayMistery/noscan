@@ -3,6 +3,7 @@ package cmd
 import (
 	"flag"
 	version "github.com/MayMistery/noscan/.version"
+	"os"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -51,6 +52,7 @@ func Flag(config *Configs) {
 
 	if config.help == true {
 		flag.PrintDefaults()
+		os.Exit(0)
 		// maybe need to exit
 	}
 }

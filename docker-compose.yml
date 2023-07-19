@@ -8,4 +8,3 @@ services:
       - ./result:/app/result
       - ./data:/app/data
     restart: always
-    entrypoint: [ "./noname" ]
